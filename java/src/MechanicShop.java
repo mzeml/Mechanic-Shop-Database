@@ -305,31 +305,101 @@ public class MechanicShop{
 	}//end readChoice
 	
 	public static void AddCustomer(MechanicShop esql){//1
-		
+		System.out.print("\tEnter first name: $");
+     		String f_name = in.readLine();
+     		System.out.print("\tEnter last name: $");
+     		String l_name = in.readLine();
+     		System.out.print("\tEnter phone number: $");
+     		String phone = in.readLine();
+     		System.out.print("\tEnter address: $");
+     		String address = in.readLine();
+     
+     		Statement statement = conn.createStatement();
+     		statement.executeUpdate("INSERT INTO Customer " + "VALUES (1,f_name,l_name,phone,address)");
+     //STILL NEED TO CHECK FOR CORRECT INPUT
+     //NAMES AND PHONE MUST BE LESS THAN 32 CHARS, ADDRESS < 256 CHARS
+     //NEED UNIQUE IDS
 	}
 	
 	public static void AddMechanic(MechanicShop esql){//2
-		
+		System.out.print("\tEnter first name: $");
+     		String f_name = in.readLine();
+     		System.out.print("\tEnter last name: $");
+     		String l_name = in.readLine();
+     		System.out.print("\tEnter experience in terms of years: $");
+     		_YEAR experience = in.readLine();
+    	 
+     		Statement statement = conn.createStatement();
+     		statement.executeUpdate("INSERT INTO Mechanic " + "VALUES (1,f_name,l_name,experience)");
+     //NAMES MUST BE LESS THAN 32 CHARS
+     //NEED UNIQUE IDS
 	}
 	
 	public static void AddCar(MechanicShop esql){//3
-		
+		 System.out.print("\tEnter vehicle identification number: $");
+     		String vin = in.readLine();
+     		System.out.print("\tEnter make: $");
+     		String make = in.readLine();
+     		System.out.print("\tEnter model: $");
+     		String model = in.readLine();
+     		System.out.print("\tEnter year: $");
+     		_YEAR year = in.readLine();
+     
+     		Statement statement = conn.createStatement();
+     		statement.executeUpdate("INSERT INTO Car " + "VALUES (vin,make,model,year)");
+     //FIX
 	}
 	
 	public static void InsertServiceRequest(MechanicShop esql){//4
-		
+		String query = "SELECT customer.fname. customer.lname FROM Customer WHERE customer.lname = ";
+     		System.out.print("\tEnter last name: $");
+     		query += input;
+     
+     //CHOOSE WHICH CUSTOMER WITH CHOSEN LAST NAME
+     //ADD A NEW CUSTOMER IF NOT IN DATABASE
+     
+     		int rowCount = esql.executeQuery(query);
+     		System.out.println("total row(s): " + rowCount);
+     
+     //DISPLAY ALL OF CHOSEN CUSTOMER'S CARS
+     //IF NO CAR, ADD NEW CAR
+     
+     //CREATE SERVICE REQUEST
+     //Statement statement = conn.createStatement();
+     //statement.executeUpdate("INSERT INTO Service_Request " + "VALUES (1,2,3,4,5,6)")
 	}
 	
 	public static void CloseServiceRequest(MechanicShop esql) throws Exception{//5
-		
+		String query = "SELECT  FROM Mechanic, Service_Request WHERE service.rid = ";
+    	 	System.out.print("\tEnter service request number: $");
+     		query += input;
+     
+     //CHECK VALIDITY OF INPUTS
+     //GIVEN EMPLOYEE ID CREATE CLOSED SERVICE REQUEST
+     
+     		int rowCount = esql.executeQuery(query);
+     		System.out.println("total row(s): " + rowCount);
 	}
 	
 	public static void ListCustomersWithBillLessThan100(MechanicShop esql){//6
-		
+		try{
+   //POSSIBLY WRONG, FOR ALL CLOSED REQUESTS WITH BILL LOWER THAN 100
+     			String query = "SELECT close.date, close.comment, close.bill FROM Customer, Service_Request, Closed_Request WHERE cutomer.id = service.customer_id AND service.rid = close.rid AND close.bill < 100";
+     			int rowCount = esql.executeQuery(query);
+     			System.out.println("total row(s): " + rowCount);
+   		}catch(Exception e){
+     			System.err.println(e.getMessage());
+   		}
 	}
 	
 	public static void ListCustomersWithMoreThan20Cars(MechanicShop esql){//7
-		
+		try{
+     			String query = "SELECT car.make, car.model, car.year FROM Car, Service_Request WHERE car.vin = service.car_vin AND car.year < 1995 AND service.odometer < 50000";
+     			int rowCount = esql.executeQuery(query);
+     			System.out.println("total row(s): " + rowCount);
+   		}catch(Exception e){
+     			System.err.println(e.getMessage());
+   		}
 	}
 	
 	public static void ListCarsBefore1995With50000Milles(MechanicShop esql){//8
