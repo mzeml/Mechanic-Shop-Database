@@ -304,6 +304,46 @@ public class MechanicShop{
 		return input;
 	}//end readChoice
 	
+	//Added functions to avoid repeating code
+
+	//For all these, we might need to check for NULLs as well
+	public static String charCheck13(String input){
+		if(input.length() <= 13){ //FIXME: Is it less than 13 or less than equal to 13?
+			return input;
+		}
+		else{
+			return input.substring(0,13); //Might need to adjust length
+		}
+	}
+
+	public static String charCheck16(String input){
+		if(input.length() <= 16){ //FIXME: Is it less than 16 or less than equal to 16?
+			return input;
+		}
+		else{
+			return input.substring(0,16); //Might need to adjust length
+		}
+	}
+
+	public static String charCheck32(String input){
+		if(input.length() <= 32){ //FIXME: Is it less than 32 or less than equal to 32?
+			return input;
+		}
+		else{
+			return input.substring(0,32); //Might need to adjust length
+		}
+	}
+
+	public static String charCheck256(String input){
+		if(input.length() <= 256){ //FIXME: Is it less than 256 or less than equal to 256?
+			return input;
+		}
+		else{
+			return input.substring(0,256); //Might need to adjust length
+		}
+	}
+
+
 	public static void AddCustomer(MechanicShop esql){//1
 		System.out.print("\tEnter first name: $");
      		String f_name = in.readLine();
@@ -313,12 +353,20 @@ public class MechanicShop{
      		String phone = in.readLine();
      		System.out.print("\tEnter address: $");
      		String address = in.readLine();
-     
+	 
+			//Prepares info to be inserted
+			f_name = charCheck32(f_name);
+			l_name = charCheck32(l_name);
+			phone = charCheck13(phone);
+			address = charCheck256(address);
+			 
+
+			 //Checks if address string is less than 256. Not sure what should be the else case?
      		Statement statement = conn.createStatement();
      		statement.executeUpdate("INSERT INTO Customer " + "VALUES (1,f_name,l_name,phone,address)");
-     //STILL NEED TO CHECK FOR CORRECT INPUT
-     //NAMES AND PHONE MUST BE LESS THAN 32 CHARS, ADDRESS < 256 CHARS
-     //NEED UNIQUE IDS
+	 //NEED UNIQUE IDS
+		//We could use sequence for this (like lab 8)? 
+		//Exisiting data starts with 499
 	}
 	
 	public static void AddMechanic(MechanicShop esql){//2
@@ -328,10 +376,13 @@ public class MechanicShop{
      		String l_name = in.readLine();
      		System.out.print("\tEnter experience in terms of years: $");
      		_YEAR experience = in.readLine();
-    	 
+		 
+			f_name = charCheck32(f_name);
+			l_name = charCheck32(l_name);
+
      		Statement statement = conn.createStatement();
      		statement.executeUpdate("INSERT INTO Mechanic " + "VALUES (1,f_name,l_name,experience)");
-     //NAMES MUST BE LESS THAN 32 CHARS
+
      //NEED UNIQUE IDS
 	}
 	
@@ -344,7 +395,11 @@ public class MechanicShop{
      		String model = in.readLine();
      		System.out.print("\tEnter year: $");
      		_YEAR year = in.readLine();
-     
+	 
+			vin = charCheck16(vin);
+			make = charCheck32(make);
+			model = charCheck32(model);
+
      		Statement statement = conn.createStatement();
      		statement.executeUpdate("INSERT INTO Car " + "VALUES (vin,make,model,year)");
      //FIX
@@ -407,7 +462,7 @@ public class MechanicShop{
 	}
 	
 	public static void ListKCarsWithTheMostServices(MechanicShop esql){//9
-		//
+		//Ask user for k
 		
 	}
 	
