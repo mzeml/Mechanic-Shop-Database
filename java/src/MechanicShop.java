@@ -307,163 +307,231 @@ public class MechanicShop{
 	//Added functions to avoid repeating code
 
 	//For all these, we might need to check for NULLs as well
-	public static String charCheck13(String input){
-		if(input.length() <= 13){ //FIXME: Is it less than 13 or less than equal to 13?
-			return input;
+	public static boolean checkPhoneNum(String input){ //FIXME: make sure to accept only format that exisiting data is in!!! (CHECK THE DATA FILES)
+		if(input.length() == 13){ //FIXME: Is it less than 13 or less than equal to 13?
+			//FIXME: Check if in correct format (###)###-####
+			
+			return true;
 		}
 		else{
-			return input.substring(0,13); //Might need to adjust length
+			return false; //Might need to adjust length
 		}
 	}
 
-	public static String charCheck16(String input){
-		if(input.length() <= 16){ //FIXME: Is it less than 16 or less than equal to 16?
-			return input;
+	public static boolean charCheck16(String input){
+		if(input.length() <= 16 && input.length() > 0){ //FIXME: Is it less than 16 or less than equal to 16?
+			return true;
 		}
 		else{
-			return input.substring(0,16); //Might need to adjust length
+			return false;
+		}
+	}
+	public static boolean vinCheck(String input){ //FIXME: VIN HAS TO BE 11 to 17 CHARACTERS LONG. I assume due to index starting at 0, this translates to 10 to 17
+		if(input.length() <= 16 && input.length() > 9 ){
+			return true;
+		}
+		else{
+			return false;
 		}
 	}
 
-	public static String charCheck32(String input){
-		if(input.length() <= 32){ //FIXME: Is it less than 32 or less than equal to 32?
-			return input;
+	public static boolean charCheck32(String input){
+		if(input.length() <= 32 || input.length() > 0){ //FIXME: Is it less than 32 or less than equal to 32?
+			return true;
 		}
 		else{
-			return input.substring(0,32); //Might need to adjust length
+			return false;
 		}
 	}
 
-	public static String charCheck256(String input){
-		if(input.length() <= 256){ //FIXME: Is it less than 256 or less than equal to 256?
-			return input;
+	public static boolean addrCheck(String input){
+		if(input.length() <= 256 || input.length() > 0){ //FIXME: Is it less than 256 or less than equal to 256?
+			return true;
 		}
 		else{
-			return input.substring(0,256); //Might need to adjust length
+			return false;
 		}
 	}
 
 
 	public static void AddCustomer(MechanicShop esql){//1
-		System.out.print("\tEnter first name: $");
-     		String f_name = in.readLine();
-     		System.out.print("\tEnter last name: $");
-     		String l_name = in.readLine();
-     		System.out.print("\tEnter phone number: $");
-     		String phone = in.readLine();
-     		System.out.print("\tEnter address: $");
-     		String address = in.readLine();
-	 
-			//Prepares info to be inserted
-			f_name = charCheck32(f_name);
-			l_name = charCheck32(l_name);
-			phone = charCheck13(phone);
-			address = charCheck256(address);
-			 
-
-			 //Checks if address string is less than 256. Not sure what should be the else case?
-     		Statement statement = conn.createStatement();
-     		statement.executeUpdate("INSERT INTO Customer " + "VALUES (1,f_name,l_name,phone,address)");
-	 //NEED UNIQUE IDS
-		//We could use sequence for this (like lab 8)? 
-		//Exisiting data starts with 499
+		try{	
+				System.out.print("\tEnter first name: $");
+				String f_name = in.readLine();
+				while(!charCheck32(f_name)){ //FIXME: See if this works! If it does, implement it everywhere else
+					System.out.print("\tERROR: First name too long or too short! Enter first name again: $");
+					f_name = in.readLine();
+				}
+				System.out.print("\tEnter last name: $");
+				String l_name = in.readLine();
+				System.out.print("\tEnter phone number as (###)###-#### (replace the '#' with numbers): $");
+				String phone = in.readLine();
+				System.out.print("\tEnter address: $");
+				String address = in.readLine();
+		
+				//Gets the largest ID value and adds 1 so we have our ID for new entry
+				String query = "SELECT MAX(id) AS maxID FROM Customer";
+				List<List<String>> maxIDStr = esql.executeQueryAndReturnResult(query);
+				int maxIDint = Integer.parseInt(maxIDStr.get(0).get(0)) + 1;
+				
+				
+				
+				//Statement statement = conn.createStatement();
+				esql.executeUpdate("INSERT INTO Customer " + "VALUES (" + maxIDint + "," + f_name + "," + l_name + "," + phone + "," + address + ")");
+			}
+			catch(Exception e){
+				System.err.println(e.getMessage());
+			}
 	}
 	
 	public static void AddMechanic(MechanicShop esql){//2
-		System.out.print("\tEnter first name: $");
-     		String f_name = in.readLine();
-     		System.out.print("\tEnter last name: $");
-     		String l_name = in.readLine();
-     		System.out.print("\tEnter experience in terms of years: $");
-     		_YEAR experience = in.readLine();
+	
+		try{
+			// System.out.print("\tEnter first name: $");
+     	// 	String f_name = in.readLine();
+     	// 	System.out.print("\tEnter last name: $");
+     	// 	String l_name = in.readLine();
+     	// 	System.out.print("\tEnter experience in terms of years: $");
+     	// 	//_YEAR experience = in.readLine();
 		 
-			f_name = charCheck32(f_name);
-			l_name = charCheck32(l_name);
+		// 	//f_name = charCheck32(f_name);
+		// 	//l_name = charCheck32(l_name);
 
-     		Statement statement = conn.createStatement();
-     		statement.executeUpdate("INSERT INTO Mechanic " + "VALUES (1,f_name,l_name,experience)");
+		// 	//I want to find the largest ID in the system and add 1 to it. That will be our unique id. I have no idea how to do this though. Once we get it, we can add the value in
+		// 	String query = "SELECT MAX(id) FROM Customer";
+		// 	int rowCount = esql.executeQuery(query);
+
+
+
+     	// 	//Statement statement = conn.createStatement();
+     	// 	esql.executeUpdate("INSERT INTO Mechanic " + "VALUES (1,f_name,l_name,experience)");
+		}
+		catch(Exception e){
+			System.err.println(e.getMessage());
+		}
 
      //NEED UNIQUE IDS
 	}
 	
 	public static void AddCar(MechanicShop esql){//3
-		 System.out.print("\tEnter vehicle identification number: $");
-     		String vin = in.readLine();
-     		System.out.print("\tEnter make: $");
-     		String make = in.readLine();
-     		System.out.print("\tEnter model: $");
-     		String model = in.readLine();
-     		System.out.print("\tEnter year: $");
-     		_YEAR year = in.readLine();
+		try{
+		//  System.out.print("\tEnter vehicle identification number: $");
+     	// 	String vin = in.readLine();
+     	// 	System.out.print("\tEnter make: $");
+     	// 	String make = in.readLine();
+     	// 	System.out.print("\tEnter model: $");
+     	// 	String model = in.readLine();
+     	// 	System.out.print("\tEnter year: $");
+     		//_YEAR year = in.readLine();
 	 
-			vin = charCheck16(vin);
-			make = charCheck32(make);
-			model = charCheck32(model);
+			//vin = charCheck16(vin);
+			//make = charCheck32(make);
+			//model = charCheck32(model);
 
-     		Statement statement = conn.createStatement();
-     		statement.executeUpdate("INSERT INTO Car " + "VALUES (vin,make,model,year)");
-     //FIX
+     		//Statement statement = conn.createStatement();
+     		//statement.executeUpdate("INSERT INTO Car " + "VALUES (vin,make,model,year)");
+	 //FIX
+		}
+		catch(Exception e){
+			System.err.println(e.getMessage());
+		}
 	}
 	
 	public static void InsertServiceRequest(MechanicShop esql){//4
-		String query = "SELECT customer.fname. customer.lname FROM Customer WHERE customer.lname = ";
-     		System.out.print("\tEnter last name: $");
-     		query += input;
+		try{
+	// 	String query = "SELECT customer.fname. customer.lname FROM Customer WHERE customer.lname = ";
+    //  		//System.out.print("\tEnter last name: $");
+			
+	// 		 //input = charCheck32(input);
+	// 		 //query += input;
      
-     //CHOOSE WHICH CUSTOMER WITH CHOSEN LAST NAME
-     //ADD A NEW CUSTOMER IF NOT IN DATABASE
+    //  //CHOOSE WHICH CUSTOMER WITH CHOSEN LAST NAME
+    //  //ADD A NEW CUSTOMER IF NOT IN DATABASE
      
-     		int rowCount = esql.executeQuery(query);
-     		System.out.println("total row(s): " + rowCount);
+    //  		int rowCount = esql.executeQuery(query);
+    //  		System.out.println("total row(s): " + rowCount);
      
      //DISPLAY ALL OF CHOSEN CUSTOMER'S CARS
      //IF NO CAR, ADD NEW CAR
      
      //CREATE SERVICE REQUEST
      //Statement statement = conn.createStatement();
-     //statement.executeUpdate("INSERT INTO Service_Request " + "VALUES (1,2,3,4,5,6)")
+	 //statement.executeUpdate("INSERT INTO Service_Request " + "VALUES (1,2,3,4,5,6)")
+		}
+		catch(Exception e){
+			System.err.println(e.getMessage());
+		}
 	}
 	
 	public static void CloseServiceRequest(MechanicShop esql) throws Exception{//5
-		String query = "SELECT  FROM Mechanic, Service_Request WHERE service.rid = ";
-    	 	System.out.print("\tEnter service request number: $");
-     		query += input;
+		try{
+		// 	String query = "SELECT  FROM Mechanic, Service_Request WHERE service.rid = ";
+    // 	 	System.out.print("\tEnter service request number: $");
+	// 		//FIXME: get input 
+	// 		 //query += input;
      
-     //CHECK VALIDITY OF INPUTS
-     //GIVEN EMPLOYEE ID CREATE CLOSED SERVICE REQUEST
+    //  //CHECK VALIDITY OF INPUTS
+    //  //GIVEN EMPLOYEE ID CREATE CLOSED SERVICE REQUEST
      
-     		int rowCount = esql.executeQuery(query);
-     		System.out.println("total row(s): " + rowCount);
+    //  		int rowCount = esql.executeQuery(query);
+	//  		System.out.println("total row(s): " + rowCount);
+		}
+		catch(Exception e){
+			System.err.println(e.getMessage());
+		}
 	}
 	
 	public static void ListCustomersWithBillLessThan100(MechanicShop esql){//6
 		try{
-   //POSSIBLY WRONG, FOR ALL CLOSED REQUESTS WITH BILL LOWER THAN 100
-     			String query = "SELECT close.date, close.comment, close.bill FROM Customer, Service_Request, Closed_Request WHERE cutomer.id = service.customer_id AND service.rid = close.rid AND close.bill < 100";
-     			int rowCount = esql.executeQuery(query);
-     			System.out.println("total row(s): " + rowCount);
-   		}catch(Exception e){
-     			System.err.println(e.getMessage());
-   		}
+//    //POSSIBLY WRONG, FOR ALL CLOSED REQUESTS WITH BILL LOWER THAN 100
+//      			String query = "SELECT close.date, close.comment, close.bill FROM Customer customer, Service_Request service, Closed_Request close WHERE customer.id = service.customer_id AND service.rid = close.rid AND close.bill < 100";
+//      			int rowCount = esql.executeQuery(query);
+//      			System.out.println("total row(s): " + rowCount);
+//    		}catch(Exception e){
+//      			System.err.println(e.getMessage());
+		 }
+		 catch(Exception e){
+			System.err.println(e.getMessage());
+		 }
 	}
 	
 	public static void ListCustomersWithMoreThan20Cars(MechanicShop esql){//7
 		try{
-     			String query = "SELECT car.make, car.model, car.year FROM Car, Service_Request WHERE car.vin = service.car_vin AND car.year < 1995 AND service.odometer < 50000";
-     			int rowCount = esql.executeQuery(query);
-     			System.out.println("total row(s): " + rowCount);
-   		}catch(Exception e){
-     			System.err.println(e.getMessage());
-   		}
+     	// 		String query = "SELECT car.make, car.model, car.year FROM Car, Service_Request WHERE car.vin = service.car_vin AND car.year < 1995 AND service.odometer < 50000"; //Wrong query
+     	// 		int rowCount = esql.executeQuery(query);
+     	// 		System.out.println("total row(s): " + rowCount);
+   		// }catch(Exception e){
+     	// 		System.err.println(e.getMessage());
+		}
+		catch(Exception e){
+			System.err.println(e.getMessage());
+		}
 	}
 	
 	public static void ListCarsBefore1995With50000Milles(MechanicShop esql){//8
-		
+		try{
+	// 		String query = "SELECT car.make, car.model, car.year FROM Car, Service_Request WHERE car.vin = service.car_vin AND car.year < 1995 AND service.odometer < 50000";
+	// 		//System.out.println("total row(s): " + rowCount);
+	//   }catch(Exception e){
+	// 		System.err.println(e.getMessage());
+	   }
+	   catch(Exception e){
+		System.err.println(e.getMessage());
+	   }
+
+	//I think this would work better as it will return no dupes (due to join). I just don't know how to translate into java query
+	//   "SELECT car.vin, car.make, car.model, car.year FROM Car WHERE car.year < 1995"
+	//   "SELECT service.car_vin FROM Service_Request WHERE service.odometer < 50000"
+	//   "INNER JOIN car ON service.car_vin = car.vin"
+
+	//OR we can keep what there is an just have an assumption that we are fine with multiple requests for the same car (I think this is the better option actually)
 	}
 	
 	public static void ListKCarsWithTheMostServices(MechanicShop esql){//9
 		//Ask user for k
-		
+		//Make sure k does not exceed count(CAR) (run a query to see how many car records in Car table and save value)
+
+	//
 	}
 	
 	public static void ListCustomersInDescendingOrderOfTheirTotalBill(MechanicShop esql){//9
