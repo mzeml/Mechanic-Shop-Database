@@ -415,16 +415,22 @@ public class MechanicShop{
 					System.out.print("\nERROR: Address is too long or too short! Enter address again: $");
 					address = in.readLine();
 				}
+				
 		
 				//Gets the largest ID value and adds 1 so we have our ID for new entry
 				String query = "SELECT MAX(id) AS maxID FROM Customer";
 				List<List<String>> maxIDStr = esql.executeQueryAndReturnResult(query);
 				int maxIDint = Integer.parseInt(maxIDStr.get(0).get(0)) + 1;
+
+
 				
 				
 				
 				//FIXME: Not correct format!
 				//esql.executeUpdate("INSERT INTO Customer (id, fname, lname, phone, address) VALUES (" + maxIDint + "," + f_name + "," + l_name + "," + phone + "," + address + ")");
+
+				//Call addCar(esql) as according to ER diagram given, a customer HAS to own at least one car
+				AddCar(esql);
 			}
 			catch(Exception e){
 				System.err.println(e.getMessage());
@@ -481,6 +487,27 @@ public class MechanicShop{
 				System.out.print("\nERROR: VIN is less than 11 or greater than 17! Enter VIN again: $");
 				vin = in.readLine();
 			 }
+			//CHECK IF VIN ALREADY EXISTS IN SYSTEM!!!!!
+			 String searchVin = "SELECT DISTINCT vin FROM Car";
+			 List<List<String>> existingCarsTable = esql.executeQueryAndReturnResult(searchVin);
+			 if(existingCarsTable.size() != 0){
+				System.out.print("\nERROR: Car already in system! Going back to menu!");
+				return;
+			 }
+			//  while(existingCarsTable.size() != 0){
+			// 	System.out.print("\nERROR: Car already in system! Enter a different VIN or 'EXIT' to go back to main menu: $");
+			// 	vin = in.readLine();
+			// 	if(vin == "EXIT"){
+			// 		return;
+			// 	}
+			// 	while(!vinCheck(vin)){
+			// 		System.out.print("\nERROR: VIN is less than 11 or greater than 17! Enter VIN again: $");
+			// 		vin = in.readLine();
+			// 	}
+			// 	String searchVin = "SELECT DISTINCT vin FROM Car";
+			//  	List<List<String>> existingCarsTable = esql.executeQueryAndReturnResult(searchVin);
+			//  }
+
      		System.out.print("\tEnter make: $");
 			String make = in.readLine();
 			while(!charCheck32(make)){
@@ -489,7 +516,7 @@ public class MechanicShop{
 			}
      		System.out.print("\tEnter model: $");
 			String model = in.readLine();
-			while(!charCheck32(make)){
+			while(!charCheck32(model)){
 				System.out.print("\nERROR: Model character length is less than 1 or greater than 32! Enter model again: $");
 				model = in.readLine();
 			}
@@ -500,11 +527,95 @@ public class MechanicShop{
 				year = in.readLine();
 			}
 
+
 			//How do we know who ownes the car????
 
 			 //Statement statement = conn.createStatement();
-			 	//statement.executeUpdate("INSERT INTO Car " + "VALUES (vin,make,model,year)");
-	 //FIX
+				 //statement.executeUpdate("INSERT INTO Car " + "VALUES (vin,make,model,year)");
+				 
+			//ask for an owner to assign as according to ER diagram, a car must have an owner
+			System.out.print("\tEnter the last name of the customer who owns this car: $");
+			String l_name = in.readLine();
+				while(!charCheck32(l_name)){
+					System.out.print("\nERROR: Last name too long or too short! Enter last name again: $");
+					l_name = in.readLine();
+				}
+			String findCustomerQuery = "SELECT * FROM Customer customer WHERE UPPER(customer.lname) = UPPER('" + l_name + "')"; //This makes sure if someone enters all upper or mix of upper or lower we still find the person eg BOB == bob == bOb
+			List<List<String>> customersTable = esql.executeQueryAndReturnResult(findCustomerQuery);
+
+			if(customersTable.size() == 0){
+				System.out.print("\nNo customer found! Would you like to make a new customer (you can't insert a car without a customer)? (Enter 'Y' or 'N'): $");
+				String choice_1 = in.readLine(); //Note: The vriable is declared a few lines above!
+				while(!boolCheck(choice_1)){
+					System.out.print("\nERROR: Invalid value entered. Please enter 'Y' or 'N': $");
+					choice_1 = in.readLine();
+				}
+				if(choice_1 == "Y"){
+					AddCustomer(esql);
+					return;
+				}
+				else{
+					return;
+				}
+			}
+			else{ //customers exist
+				for(int i = 0; i < customersTable.size(); ++i){
+					//Index | Fname | Lname | Phone | Address
+
+					System.out.println("INDEX: " + Integer.toString(i + 1) + " FIRST NAME: " + customersTable.get(i).get(1) + " LAST NAME: " + customersTable.get(i).get(2) + " PHONE: " + customersTable.get(i).get(3) + " ADDRESS: " + customersTable.get(i).get(4) + "\n");//CHECK HERE IF OUTOFBOUND OCCURS 
+				}
+				System.out.print("\nIs the customer you are looking for listed? (Enter 'Y' or 'N'): $");
+				String choice_2 = in.readLine();
+				while(!boolCheck(choice_2)){
+					System.out.print("\nERROR: Invalid value entered. Please enter 'Y' or 'N': $");
+					choice_2 = in.readLine();
+				}
+				if(choice_2 == "Y"){
+					System.out.print("\nEnter index of the customer: $");
+					String custID = in.readLine();
+					int custIDint = Integer.parseInt(custID);
+					int tableSize = customersTable.size();
+					while(custIDint < 0 || custIDint > tableSize){ //CHECK TO SEE IF THIS IS THE CORRECT BOUND!!!!!
+						System.out.print("\nERROR: Invalid index value. Please enter a valid index value: $");
+						custID = in.readLine();
+					}
+					String currCustID =" -1";
+					for(int i = 0; i < customersTable.size(); ++i){
+						if (custIDint == i){ 
+							currCustID = customersTable.get(i).get(0);
+							break;
+						}
+					}
+					//Adds car
+
+					//Check if VIN is already owned by someone (Check the Owns table for that VIN)
+					//If it does, say that the car is already
+
+					//statement.executeUpdate("INSERT INTO Car " + "VALUES (vin,make,model,year)"); //FIXME: Also what happens if a car already exists?
+
+					//Adding an Owns record
+					//Find the largest OwnsID (ownership_id)
+					//Insert new Owns record using the customer ID, VIN, and ownership ID
+						//currCustID is the customerID (I think). Use this in the owns function!
+				
+					//statement.executeUpdate("INSERT INTO Owns " + "VALUES (vin,make,model,year)")
+				}
+				else{
+					System.out.print("\nWould you like to make a new customer (you can't insert a car without a customer)? (Enter 'Y' or 'N'): $");
+					String choice_3 = in.readLine(); //Note: The vriable is declared a few lines above!
+					while(!boolCheck(choice_3)){
+					System.out.print("\nERROR: Invalid value entered. Please enter 'Y' or 'N': $");
+					choice_3 = in.readLine();
+					}
+					if(choice_3 == "Y"){
+						AddCustomer(esql);
+						return;
+					}
+					else{
+						return; //goes to menu
+					}
+				}
+			}
 		}
 		catch(Exception e){
 			System.err.println(e.getMessage());
