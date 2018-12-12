@@ -307,7 +307,7 @@ public class MechanicShop{
 	//Added functions to avoid repeating code
 
 	//For all these, we might need to check for NULLs as well
-	public static boolean checkPhoneNum(String input){ //FIXME: make sure to accept only format that exisiting data is in!!! (CHECK THE DATA FILES)
+	public static boolean phoneCheck(String input){ //FIXME: make sure to accept only format that exisiting data is in!!! (CHECK THE DATA FILES)
 		if(input.length() == 13){ //FIXME: Is it less than 13 or less than equal to 13?
 			//FIXME: Check if in correct format (###)###-####
 			
@@ -336,7 +336,7 @@ public class MechanicShop{
 	}
 
 	public static boolean charCheck32(String input){
-		if(input.length() <= 32 || input.length() > 0){ //FIXME: Is it less than 32 or less than equal to 32?
+		if(input.length() <= 32 && input.length() > 0){ //FIXME: Is it less than 32 or less than equal to 32?
 			return true;
 		}
 		else{
@@ -345,7 +345,40 @@ public class MechanicShop{
 	}
 
 	public static boolean addrCheck(String input){
-		if(input.length() <= 256 || input.length() > 0){ //FIXME: Is it less than 256 or less than equal to 256?
+		if(input.length() <= 256 && input.length() > 0){ //FIXME: Is it less than 256 or less than equal to 256?
+			return true;
+		}
+		else{
+			return false;
+		}
+	}
+	public static boolean experienceCheck(int input){ //ASSUMPTION: Mechanics can have 0 years of experience (newbies) and 99 is the max (they retire otherwise)
+		if(input >= 0 && input < 100){
+			return true;
+		}
+		else{
+			return false;
+		}
+	}
+	public static boolean yearCheck(int input){ //ASSUMPTION: Mechanics can have 0 years of experience (newbies) and 99 is the max (they retire otherwise)
+		if(input >= 1970){
+			return true;
+		}
+		else{
+			return false;
+		}
+	}
+	public static boolean boolCheck(char input){
+		if(input == 'Y' || input == 'N'){
+			return true;
+		}
+		else{
+			return false;
+		}
+	}
+
+	public static boolean choiceCheck(int input){
+		if(input == 1 || input == 2){
 			return true;
 		}
 		else{
@@ -358,16 +391,28 @@ public class MechanicShop{
 		try{	
 				System.out.print("\tEnter first name: $");
 				String f_name = in.readLine();
-				while(!charCheck32(f_name)){ //FIXME: See if this works! If it does, implement it everywhere else
-					System.out.print("\tERROR: First name too long or too short! Enter first name again: $");
+				while(!charCheck32(f_name)){
+					System.out.print("\nERROR: First name too long or too short! Enter first name again: $");
 					f_name = in.readLine();
 				}
 				System.out.print("\tEnter last name: $");
 				String l_name = in.readLine();
+				while(!charCheck32(l_name)){
+					System.out.print("\nERROR: Last name too long or too short! Enter last name again: $");
+					l_name = in.readLine();
+				}
 				System.out.print("\tEnter phone number as (###)###-#### (replace the '#' with numbers): $");
 				String phone = in.readLine();
+				while(!phoneCheck(phone)){
+					System.out.print("\nERROR: Phone number does not match required format! Enter phone number again: $");
+					phone = in.readLine();
+				}
 				System.out.print("\tEnter address: $");
 				String address = in.readLine();
+				while(!addrCheck(address)){
+					System.out.print("\nERROR: Address is too long or too short! Enter address again: $");
+					address = in.readLine();
+				}
 		
 				//Gets the largest ID value and adds 1 so we have our ID for new entry
 				String query = "SELECT MAX(id) AS maxID FROM Customer";
@@ -376,8 +421,8 @@ public class MechanicShop{
 				
 				
 				
-				//Statement statement = conn.createStatement();
-				esql.executeUpdate("INSERT INTO Customer " + "VALUES (" + maxIDint + "," + f_name + "," + l_name + "," + phone + "," + address + ")");
+				//FIXME: Not correct format!
+				//esql.executeUpdate("INSERT INTO Customer (id, fname, lname, phone, address) VALUES (" + maxIDint + "," + f_name + "," + l_name + "," + phone + "," + address + ")");
 			}
 			catch(Exception e){
 				System.err.println(e.getMessage());
@@ -387,21 +432,37 @@ public class MechanicShop{
 	public static void AddMechanic(MechanicShop esql){//2
 	
 		try{
-			// System.out.print("\tEnter first name: $");
-     	// 	String f_name = in.readLine();
-     	// 	System.out.print("\tEnter last name: $");
-     	// 	String l_name = in.readLine();
-     	// 	System.out.print("\tEnter experience in terms of years: $");
-     	// 	//_YEAR experience = in.readLine();
+			System.out.print("\tEnter first name: $");
+			String f_name = in.readLine();
+			while(!charCheck32(f_name)){
+				System.out.print("\nERROR: First name too long or too short! Enter first name again: $");
+				f_name = in.readLine();
+			}
+     		System.out.print("\tEnter last name: $");
+			String l_name = in.readLine();
+			String l_name = in.readLine();
+			while(!charCheck32(l_name)){
+				System.out.print("\nERROR: Last name too long or too short! Enter last name again: $");
+				l_name = in.readLine();
+			} 
+     		System.out.print("\tEnter experience in terms of years as a number (0 to 99): $");
+			int experience = in.readLine();
+			while(!experienceCheck(experience)){
+				System.out.print("\nERROR: Experience is less than 0 or greater than 99! Enter years of experience again: $");
+				experience = in.readLine();
+			}
+			
 		 
-		// 	//f_name = charCheck32(f_name);
-		// 	//l_name = charCheck32(l_name);
+
 
 		// 	//I want to find the largest ID in the system and add 1 to it. That will be our unique id. I have no idea how to do this though. Once we get it, we can add the value in
 		// 	String query = "SELECT MAX(id) FROM Customer";
 		// 	int rowCount = esql.executeQuery(query);
+		String query = "SELECT MAX(id) AS maxID FROM Mechanic";
+		List<List<String>> maxIDStr = esql.executeQueryAndReturnResult(query);
+		int maxIDint = Integer.parseInt(maxIDStr.get(0).get(0)) + 1;
 
-
+		//FIXME: Add insert query
 
      	// 	//Statement statement = conn.createStatement();
      	// 	esql.executeUpdate("INSERT INTO Mechanic " + "VALUES (1,f_name,l_name,experience)");
@@ -410,23 +471,34 @@ public class MechanicShop{
 			System.err.println(e.getMessage());
 		}
 
-     //NEED UNIQUE IDS
 	}
 	
 	public static void AddCar(MechanicShop esql){//3
 		try{
-		//  System.out.print("\tEnter vehicle identification number: $");
-     	// 	String vin = in.readLine();
-     	// 	System.out.print("\tEnter make: $");
-     	// 	String make = in.readLine();
-     	// 	System.out.print("\tEnter model: $");
-     	// 	String model = in.readLine();
-     	// 	System.out.print("\tEnter year: $");
-     		//_YEAR year = in.readLine();
-	 
-			//vin = charCheck16(vin);
-			//make = charCheck32(make);
-			//model = charCheck32(model);
+			System.out.print("\tEnter vehicle identification number (11 to 17 characters long): $"); //ASUMPTION: Vin is between 11 and 17 long according to https://www.autocheck.com/vehiclehistory/autocheck/en/vinbasics
+			 String vin = in.readLine();
+			 while(!vinCheck(vin)){
+				System.out.print("\nERROR: VIN is less than 11 or greater than 17! Enter VIN again: $");
+				vin = in.readLine();
+			 }
+     		System.out.print("\tEnter make: $");
+			String make = in.readLine();
+			while(!charCheck32(make)){
+				System.out.print("\nERROR: Make character length is less than 1 or greater than 32! Enter make again: $");
+				make = in.readLine();
+			}
+     		System.out.print("\tEnter model: $");
+			String model = in.readLine();
+			while(!charCheck32(make)){
+				System.out.print("\nERROR: Model character length is less than 1 or greater than 32! Enter model again: $");
+				model = in.readLine();
+     		System.out.print("\tEnter year: $");
+			int year = in.readLine();
+			while(!yearCheck(year)){
+				System.out.print("\nERROR: Year is less than 1970! Enter year again with value equal to or greater than 1970: $");
+				year = in.in.readLine();
+			}
+
 
      		//Statement statement = conn.createStatement();
      		//statement.executeUpdate("INSERT INTO Car " + "VALUES (vin,make,model,year)");
@@ -439,24 +511,118 @@ public class MechanicShop{
 	
 	public static void InsertServiceRequest(MechanicShop esql){//4
 		try{
-	// 	String query = "SELECT customer.fname. customer.lname FROM Customer WHERE customer.lname = ";
-    //  		//System.out.print("\tEnter last name: $");
-			
-	// 		 //input = charCheck32(input);
-	// 		 //query += input;
-     
-    //  //CHOOSE WHICH CUSTOMER WITH CHOSEN LAST NAME
-    //  //ADD A NEW CUSTOMER IF NOT IN DATABASE
-     
-    //  		int rowCount = esql.executeQuery(query);
-    //  		System.out.println("total row(s): " + rowCount);
-     
-     //DISPLAY ALL OF CHOSEN CUSTOMER'S CARS
-     //IF NO CAR, ADD NEW CAR
-     
-     //CREATE SERVICE REQUEST
-     //Statement statement = conn.createStatement();
-	 //statement.executeUpdate("INSERT INTO Service_Request " + "VALUES (1,2,3,4,5,6)")
+			//int custIndex = -1
+			System.out.print("\tEnter last name of customer: $");
+				String l_name = in.readLine();
+				while(!charCheck32(l_name)){
+					System.out.print("\nERROR: Last name too long or too short! Enter last name again: $");
+					l_name = in.readLine();
+				}
+			String findCustomerQuery = "SELECT * FROM Customer customer WHERE UPPER(customer.lname) = UPPER('" + l_name + "')"; //This makes sure if someone enters all upper or mix of upper or lower we still find the person eg BOB == bob == bOb
+			List<List<String>> customersTable = esql.executeQueryAndReturnResult(findCustomerQuery);
+
+			if(customersTable.size() == 0){
+				//No customer found. Ask if insert new one? If yes, do it and continue. Else, go back to menu
+				System.out.print("\nNo customer found! Would you like to make a new customer? (Enter 'Y' or 'N'): $");
+				char choice_1 = in.readLine(); //Note: The vriable is declared a few lines above!
+					while(!boolCheck(choice)){
+						System.out.print("\nERROR: Invalid value entered. Please enter 'Y' or 'N': $");
+						choice_1 = in.readLine();
+					}
+					if(choice_1 == 'Y'){
+						//make new customer
+						AddCustomer(esql); //Note: What should happen after this runs? As it stands, if this runs, the query above is outdated so we'd need to run it again. Maybe make a function?
+						//Maybe run insert service request function again and then break? Needs testing!
+
+						InsertServiceRequest(esql); //try this and see how it works
+						break;
+					}
+					else{
+						break; //go to menu
+					}
+			}
+			else{
+				
+				for(int i = 0; i < customersTable.size(); ++i){
+					//Index | Fname | Lname | Phone | Address
+
+					System.out.println("INDEX: " + Integer.toString(i + 1) + " FIRST NAME: " + customersTable.get(i).get(1) + " LAST NAME: " + customersTable.get(i).get(2) + " PHONE: " + customersTable.get(i).get(3) + " ADDRESS: " + customersTable.get(i).get(4) + "\n");//CHECK HERE IF OUTOFBOUND OCCURS 
+				}
+				System.out.print("\nIs the customer you are looking for listed? (Enter 'Y' or 'N'): $");
+				char choice_2 = in.readLine();
+				while(!boolCheck(choice)){
+					System.out.print("\nERROR: Invalid value entered. Please enter 'Y' or 'N': $");
+					choice_2 = in.readLine();
+				}
+				
+				if(choice_2 == 'Y'){
+					System.out.print("\nEnter index of the customer: $");
+					int custID = in.readLine();
+					while(custID < 0 || custID > customersTable.size()){ //CHECK TO SEE IF THIS IS THE CORRECT BOUND!!!!!
+						System.out.print("\nERROR: Invalid index value. Please enter a valid index value: $");
+						custID = in.readLine();
+					}
+					int currCustID = -1;
+					for(int i = 0; i < customersTable.size(); ++i){
+						if (custID == i){ 
+							currCustID = customersTable.get(i).get(0);
+							break;
+						}
+					}
+
+					//int currCustID = customersTable.get(custIndex).get(0);
+					Integer.toString(currCustID);
+
+					String getCars = "SELECT owns.car_vin, car.make, car.model, car.year FROM Owns owns, Car car WHERE owns.customer_id = " + currCustID + " AND car.vin = owns.car_vin;";
+					List<List<String>> ownedCarsTable = esql.executeQueryAndReturnResult(getCars);
+
+					if(ownedCarsTable.size() == 0){
+						//Enter data for new car
+						//add request
+					}
+					else{
+						//Choose exisitng car or add new one
+						for(int i = 0; i < ownedCarsTable.size(); ++i){
+							System.out.println("INDEX: " + Integer.toString(i + 1) + " CAR VIN: " + ownedCarsTable.get(i).get(0) + " CAR MAKE: " + ownedCarsTable.get(i).get(1) + " CAR MODEL: " + ownedCarsTable.get(i).get(2) + " CAR YEAR: " + ownedCarsTable.get(i).get(3));	
+						}
+						System.out.print("\nTo select a car and create a service request, enter '1'. If you would like to add a new car and enter a service request, enter '2': $");
+						int newChoice = in.readLine();
+						while(!choiceCheck(newChoice)){
+							System.out.print("\nERROR: Invalid choice! To select a car and create a service request, enter '1'. If you would like to add a new car and enter a service request, enter '2': $");
+							newChoice = in.readLine();
+						}
+						if(newChoice == 1){
+							//Select a car and then create a service request
+						}
+						else{
+							//ADD CAR
+							//ADD REQUEST
+						}
+						System.out.print("\nEnter index of the car to be serviced: $");
+						String in.readLine();
+					}
+
+				}
+				else{ //Might want to change it else if?
+					System.out.print("\nWould you like to make a new customer record? (Enter 'Y' or 'N'): $");
+					char choice_3 = in.readLine();
+					while(!boolCheck(choice)){
+						System.out.print("\nERROR: Invalid value entered. Please enter 'Y' or 'N': $");
+						choice_3 = in.readLine();
+					}
+					if(choice_3 == 'Y'){
+						//make new customer
+						AddCustomer(esql);
+						InsertServiceRequest(esql); //try this and see how it works
+						break;
+					}
+					else{
+						break; //go to menu
+					}
+				}
+
+			}
+
 		}
 		catch(Exception e){
 			System.err.println(e.getMessage());
