@@ -326,7 +326,7 @@ public class MechanicShop{
 			return false;
 		}
 	}
-	public static boolean vinCheck(String input){ //FIXME: VIN HAS TO BE 11 to 17 CHARACTERS LONG. I assume due to index starting at 0, this translates to 10 to 17
+	public static boolean vinCheck(String input){ //NOTE: VIN HAS TO BE 11 to 17 CHARACTERS LONG. I assume due to index starting at 0, this translates to 10 to 17
 		if(input.length() <= 16 && input.length() > 9 ){
 			return true;
 		}
@@ -352,24 +352,26 @@ public class MechanicShop{
 			return false;
 		}
 	}
-	public static boolean experienceCheck(int input){ //ASSUMPTION: Mechanics can have 0 years of experience (newbies) and 99 is the max (they retire otherwise)
-		if(input >= 0 && input < 100){
+	public static boolean experienceCheck(String input){ //ASSUMPTION: Mechanics can have 0 years of experience (newbies) and 99 is the max (they retire otherwise)
+		int inputInt = Integer.parseInt(input);
+		if(inputInt >= 0 && inputInt < 100){
 			return true;
 		}
 		else{
 			return false;
 		}
 	}
-	public static boolean yearCheck(int input){ //ASSUMPTION: Mechanics can have 0 years of experience (newbies) and 99 is the max (they retire otherwise)
-		if(input >= 1970){
+	public static boolean yearCheck(String input){
+		int inputInt = Integer.parseInt(input);
+		if(inputInt >= 1970){
 			return true;
 		}
 		else{
 			return false;
 		}
 	}
-	public static boolean boolCheck(char input){
-		if(input == 'Y' || input == 'N'){
+	public static boolean boolCheck(String input){
+		if(input == "Y" || input == "N"){
 			return true;
 		}
 		else{
@@ -377,8 +379,8 @@ public class MechanicShop{
 		}
 	}
 
-	public static boolean choiceCheck(int input){
-		if(input == 1 || input == 2){
+	public static boolean choiceCheck(String input){
+		if(input == "1" || input == "2"){
 			return true;
 		}
 		else{
@@ -440,24 +442,22 @@ public class MechanicShop{
 			}
      		System.out.print("\tEnter last name: $");
 			String l_name = in.readLine();
-			String l_name = in.readLine();
 			while(!charCheck32(l_name)){
 				System.out.print("\nERROR: Last name too long or too short! Enter last name again: $");
 				l_name = in.readLine();
 			} 
      		System.out.print("\tEnter experience in terms of years as a number (0 to 99): $");
-			int experience = in.readLine();
+			String experience = in.readLine();
 			while(!experienceCheck(experience)){
 				System.out.print("\nERROR: Experience is less than 0 or greater than 99! Enter years of experience again: $");
 				experience = in.readLine();
 			}
 			
+			//int experienceInt = Integer.parseInt(experience);
 		 
 
 
 		// 	//I want to find the largest ID in the system and add 1 to it. That will be our unique id. I have no idea how to do this though. Once we get it, we can add the value in
-		// 	String query = "SELECT MAX(id) FROM Customer";
-		// 	int rowCount = esql.executeQuery(query);
 		String query = "SELECT MAX(id) AS maxID FROM Mechanic";
 		List<List<String>> maxIDStr = esql.executeQueryAndReturnResult(query);
 		int maxIDint = Integer.parseInt(maxIDStr.get(0).get(0)) + 1;
@@ -492,16 +492,18 @@ public class MechanicShop{
 			while(!charCheck32(make)){
 				System.out.print("\nERROR: Model character length is less than 1 or greater than 32! Enter model again: $");
 				model = in.readLine();
+			}
      		System.out.print("\tEnter year: $");
-			int year = in.readLine();
+			String year = in.readLine();
 			while(!yearCheck(year)){
 				System.out.print("\nERROR: Year is less than 1970! Enter year again with value equal to or greater than 1970: $");
-				year = in.in.readLine();
+				year = in.readLine();
 			}
 
+			//How do we know who ownes the car????
 
-     		//Statement statement = conn.createStatement();
-     		//statement.executeUpdate("INSERT INTO Car " + "VALUES (vin,make,model,year)");
+			 //Statement statement = conn.createStatement();
+			 	//statement.executeUpdate("INSERT INTO Car " + "VALUES (vin,make,model,year)");
 	 //FIX
 		}
 		catch(Exception e){
@@ -524,21 +526,21 @@ public class MechanicShop{
 			if(customersTable.size() == 0){
 				//No customer found. Ask if insert new one? If yes, do it and continue. Else, go back to menu
 				System.out.print("\nNo customer found! Would you like to make a new customer? (Enter 'Y' or 'N'): $");
-				char choice_1 = in.readLine(); //Note: The vriable is declared a few lines above!
-					while(!boolCheck(choice)){
+				String choice_1 = in.readLine(); //Note: The vriable is declared a few lines above!
+					while(!boolCheck(choice_1)){
 						System.out.print("\nERROR: Invalid value entered. Please enter 'Y' or 'N': $");
 						choice_1 = in.readLine();
 					}
-					if(choice_1 == 'Y'){
+					if(choice_1 == "Y"){
 						//make new customer
 						AddCustomer(esql); //Note: What should happen after this runs? As it stands, if this runs, the query above is outdated so we'd need to run it again. Maybe make a function?
 						//Maybe run insert service request function again and then break? Needs testing!
 
 						InsertServiceRequest(esql); //try this and see how it works
-						break;
+						return;
 					}
 					else{
-						break; //go to menu
+						return; //go to menu
 					}
 			}
 			else{
@@ -549,75 +551,112 @@ public class MechanicShop{
 					System.out.println("INDEX: " + Integer.toString(i + 1) + " FIRST NAME: " + customersTable.get(i).get(1) + " LAST NAME: " + customersTable.get(i).get(2) + " PHONE: " + customersTable.get(i).get(3) + " ADDRESS: " + customersTable.get(i).get(4) + "\n");//CHECK HERE IF OUTOFBOUND OCCURS 
 				}
 				System.out.print("\nIs the customer you are looking for listed? (Enter 'Y' or 'N'): $");
-				char choice_2 = in.readLine();
-				while(!boolCheck(choice)){
+				String choice_2 = in.readLine();
+				while(!boolCheck(choice_2)){
 					System.out.print("\nERROR: Invalid value entered. Please enter 'Y' or 'N': $");
 					choice_2 = in.readLine();
 				}
 				
-				if(choice_2 == 'Y'){
+				if(choice_2 == "Y"){
 					System.out.print("\nEnter index of the customer: $");
-					int custID = in.readLine();
-					while(custID < 0 || custID > customersTable.size()){ //CHECK TO SEE IF THIS IS THE CORRECT BOUND!!!!!
+					String custID = in.readLine();
+					int custIDint = Integer.parseInt(custID);
+					int tableSize = customersTable.size();
+					while(custIDint < 0 || custIDint > tableSize){ //CHECK TO SEE IF THIS IS THE CORRECT BOUND!!!!!
 						System.out.print("\nERROR: Invalid index value. Please enter a valid index value: $");
 						custID = in.readLine();
 					}
-					int currCustID = -1;
+					String currCustID =" -1";
 					for(int i = 0; i < customersTable.size(); ++i){
-						if (custID == i){ 
+						if (custIDint == i){ 
 							currCustID = customersTable.get(i).get(0);
 							break;
 						}
 					}
 
 					//int currCustID = customersTable.get(custIndex).get(0);
-					Integer.toString(currCustID);
+					//String currCustIDString = Integer.toString(currCustID);
 
 					String getCars = "SELECT owns.car_vin, car.make, car.model, car.year FROM Owns owns, Car car WHERE owns.customer_id = " + currCustID + " AND car.vin = owns.car_vin;";
 					List<List<String>> ownedCarsTable = esql.executeQueryAndReturnResult(getCars);
 
 					if(ownedCarsTable.size() == 0){
 						//Enter data for new car
-						//add request
+
+						AddCar(esql);
+						//Car has been added. We need to now assign it the Owns table somehow
+
+
+						getCars = "SELECT owns.car_vin, car.make, car.model, car.year FROM Owns owns, Car car WHERE owns.customer_id = " + currCustID + " AND car.vin = owns.car_vin;";
+						ownedCarsTable = esql.executeQueryAndReturnResult(getCars);
+						//Save the ID of the customer so when this returns, you can just go to their record
+
+						//add request (continue below)
 					}
-					else{
+					//else{
 						//Choose exisitng car or add new one
 						for(int i = 0; i < ownedCarsTable.size(); ++i){
 							System.out.println("INDEX: " + Integer.toString(i + 1) + " CAR VIN: " + ownedCarsTable.get(i).get(0) + " CAR MAKE: " + ownedCarsTable.get(i).get(1) + " CAR MODEL: " + ownedCarsTable.get(i).get(2) + " CAR YEAR: " + ownedCarsTable.get(i).get(3));	
 						}
 						System.out.print("\nTo select a car and create a service request, enter '1'. If you would like to add a new car and enter a service request, enter '2': $");
-						int newChoice = in.readLine();
+						String newChoice = in.readLine();
 						while(!choiceCheck(newChoice)){
-							System.out.print("\nERROR: Invalid choice! To select a car and create a service request, enter '1'. If you would like to add a new car and enter a service request, enter '2': $");
+							System.out.print("\nERROR: Invalid choice! To select a car and create a service request, enter '1'. If you would like to add a new car and enter a service request for it, enter '2': $");
 							newChoice = in.readLine();
 						}
-						if(newChoice == 1){
+						if(newChoice == "2"){
+							
+							AddCar(esql);
+							//need to assign ownership of car to customer. How do we return a value for a function that can't return anything? Global variable?
+							//Get the newest car added
+	
+							getCars = "SELECT MAX(owns.ownership_id) FROM Owns owns, Car car WHERE owns.customer_id = " + currCustID + " AND car.vin = owns.car_vin;";
+							List<List<String>> custLastCar = esql.executeQueryAndReturnResult(getCars);
+
+							String ownedID = custLastCar.get(0).get(0);
+
+							//get the VIN of the car from Owns using the ID
+
+
+							//proceed to add request
+						}
+						else if(newChoice == "1"){
 							//Select a car and then create a service request
+							System.out.println("\n Enter the index value of the car you would like to create request for: $");
+							String carIndex = in.readLine();
+							//FIXME: See if "index" is within bounds
+
+							//It is
+							//Generate a rid
+							//Get customer id and keep it to add to insert (we can get it from the Own table where vin matches)
+							//get car vin from exisitng record
+							//Ask for the date
+							//Ask for odometer reading (have a check to see if it's an int)
+							//ask for complaint
+
+							//generate query
+
 						}
-						else{
-							//ADD CAR
-							//ADD REQUEST
-						}
-						System.out.print("\nEnter index of the car to be serviced: $");
-						String in.readLine();
-					}
+						// System.out.print("\nEnter index of the car to be serviced: $");
+						// //String in.readLine();
+					//}
 
 				}
 				else{ //Might want to change it else if?
 					System.out.print("\nWould you like to make a new customer record? (Enter 'Y' or 'N'): $");
-					char choice_3 = in.readLine();
-					while(!boolCheck(choice)){
+					String choice_3 = in.readLine();
+					while(!boolCheck(choice_3)){
 						System.out.print("\nERROR: Invalid value entered. Please enter 'Y' or 'N': $");
 						choice_3 = in.readLine();
 					}
-					if(choice_3 == 'Y'){
+					if(choice_3 == "Y"){
 						//make new customer
 						AddCustomer(esql);
 						InsertServiceRequest(esql); //try this and see how it works
-						break;
+						return;
 					}
 					else{
-						break; //go to menu
+						return; //go to menu
 					}
 				}
 
@@ -631,16 +670,25 @@ public class MechanicShop{
 	
 	public static void CloseServiceRequest(MechanicShop esql) throws Exception{//5
 		try{
-		// 	String query = "SELECT  FROM Mechanic, Service_Request WHERE service.rid = ";
-    // 	 	System.out.print("\tEnter service request number: $");
-	// 		//FIXME: get input 
-	// 		 //query += input;
-     
-    //  //CHECK VALIDITY OF INPUTS
-    //  //GIVEN EMPLOYEE ID CREATE CLOSED SERVICE REQUEST
-     
-    //  		int rowCount = esql.executeQuery(query);
-	//  		System.out.println("total row(s): " + rowCount);
+
+			//Ask for service request number and employee ID
+				//check if it is a valid input
+					//Does the employee ID exist in the database?
+					//Does the request exist?
+				//search the database
+				//if not found, say that
+				//else, continue
+			
+			//If ID and request number are valid
+			//Create a closed_request
+				//Generate a wid 
+				//copy over request number/ID
+				//copy over mechanic id as mid
+				//ask for a closing date
+					//Make sure the closing date is not before the service request date (assuming requests can be closed on the same day)
+				//ask for comment
+				//ask for bill
+			//package up and create query
 		}
 		catch(Exception e){
 			System.err.println(e.getMessage());
