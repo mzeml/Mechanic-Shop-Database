@@ -23,7 +23,8 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.util.List;
 import java.util.ArrayList;
-
+import java.util.Date;
+import java.text.SimpleDateFormat;
 /**
  * This class defines a simple embedded SQL utility class that is designed to
  * work with PostgreSQL JDBC drivers.
@@ -397,7 +398,7 @@ public class MechanicShop{
 	}
 
 	public static boolean choiceCheck(String input){
-		if(input == "1" || input == "2"){
+		if(input.equals("1") || input.equals("2")){
 			return true;
 		}
 		else{
@@ -577,9 +578,9 @@ public class MechanicShop{
 				if(choice_2.equals("Y")){
 					System.out.print("\nEnter index of the customer: $");
 					int custIndex = Integer.parseInt(in.readLine());
-                 System.out.print(custIndex + "\n");
+                // System.out.print(custIndex + "\n");
 					int tableSize = customersTable.size();
-              System.out.print(tableSize + "\n");
+              //System.out.print(tableSize + "\n");
 					while(custIndex < 1 || custIndex > tableSize){ //CHECK TO SEE IF THIS IS THE CORRECT BOUND!!!!!
 						System.out.print("\nERROR: Invalid index value. Please enter a valid index value: $");
 						custIndex = Integer.parseInt(in.readLine());
@@ -587,26 +588,17 @@ public class MechanicShop{
            
            int currCustID = Integer.parseInt(customersTable.get(custIndex - 1).get(0));
 
-					System.out.print("INSERT INTO Car (vin,make,model,year) VALUES (" + vin + "," + make + "," + model + "," + year + ")\n");
-        
-				  esql.executeUpdate("INSERT INTO Car(vin,make,model,year) VALUES ('" + vin + "','" + make + "','" + model + "'," + year + ")");
+				System.out.print("INSERT INTO Car (vin,make,model,year) VALUES (" + vin + "," + make + "," + model + "," + year + ")\n");
+				esql.executeUpdate("INSERT INTO Car(vin,make,model,year) VALUES ('" + vin + "','" + make + "','" + model + "'," + year + ")");
           
           String q = "SELECT MAX(ownership_id) FROM Owns";
-				  List<List<String>> maxIDStr = esql.executeQueryAndReturnResult(q);
-				  int maxIDint = Integer.parseInt(maxIDStr.get(0).get(0)) + 1;
+				List<List<String>> maxIDStr = esql.executeQueryAndReturnResult(q);
+				int maxIDint = Integer.parseInt(maxIDStr.get(0).get(0)) + 1;
                                        
-          System.out.print("INSERT INTO Owns(ownership_id,customer_id,car_vin) VALUES (" + maxIDint + "," + currCustID + "," + vin + ")\n");
+          		System.out.print("INSERT INTO Owns(ownership_id,customer_id,car_vin) VALUES (" + maxIDint + "," + currCustID + "," + vin + ")\n");
         
-				  esql.executeUpdate("INSERT INTO Owns(ownership_id,customer_id,car_vin) VALUES (" + maxIDint + "," + currCustID + ",'" + vin + "')");                             
+				esql.executeUpdate("INSERT INTO Owns(ownership_id,customer_id,car_vin) VALUES (" + maxIDint + "," + currCustID + ",'" + vin + "')");                             
 
-					//statement.executeUpdate("INSERT INTO Car " + "VALUES (vin,make,model,year)"); //FIXME: Also what happens if a car already exists?
-
-					//Adding an Owns record
-					//Find the largest OwnsID (ownership_id)
-					//Insert new Owns record using the customer ID, VIN, and ownership ID
-						//currCustID is the customerID (I think). Use this in the owns function!
-				
-					//statement.executeUpdate("INSERT INTO Owns " + "VALUES (vin,make,model,year)")
 				}
 				else{
 					System.out.print("\nWould you like to make a new customer (you can't insert a car without a customer)? (Enter 'Y' or 'N'): $");
@@ -615,7 +607,7 @@ public class MechanicShop{
 					System.out.print("\nERROR: Invalid value entered. Please enter 'Y' or 'N': $");
 					choice_3 = in.readLine();
 					}
-					if(choice_3 == "Y"){
+					if(choice_3.equals("Y")){
 						AddCustomer(esql);
 						return;
 					}
@@ -624,13 +616,6 @@ public class MechanicShop{
 					}
 				}
 			}
-
-
-//			 System.out.print("INSERT INTO Car (vin,make,model,year) VALUES (" + vin + "," + make + "," + model + "," + year + ")\n");
-        
-//				esql.executeUpdate("INSERT INTO Car(vin,make,model,year) VALUES (" + vin + ",'" + make + "','" + model + "','" + year + "')");
-   
-   
 		}
 		catch(Exception e){
 			System.err.println(e.getMessage());
@@ -658,11 +643,10 @@ public class MechanicShop{
 						System.out.print("\nERROR: Invalid value entered. Please enter 'Y' or 'N': $");
 						choice_1 = in.readLine();
 					}
-					if(choice_1 == "Y"){
+					if(choice_1.equals("Y")){
 						//make new customer
 						AddCustomer(esql); //Note: What should happen after this runs? As it stands, if this runs, the query above is outdated so we'd need to run it again. Maybe make a function?
 						//Maybe run insert service request function again and then break? Needs testing!
-
 						InsertServiceRequest(esql); //try this and see how it works
 						return;
 					}
@@ -684,41 +668,25 @@ public class MechanicShop{
 					choice_2 = in.readLine();
 				}
 				
-				if(choice_2 == "Y"){
+				if(choice_2.equals("Y")){
 					System.out.print("\nEnter index of the customer: $");
-					String custID = in.readLine();
-					int custIDint = Integer.parseInt(custID);
+					int custIndex = Integer.parseInt(in.readLine());
+					//int custIDint = Integer.parseInt(custID);
 					int tableSize = customersTable.size();
-					while(custIDint < 0 || custIDint > tableSize){ //CHECK TO SEE IF THIS IS THE CORRECT BOUND!!!!!
+					while(custIndex < 1 || custIndex > tableSize){ //CHECK TO SEE IF THIS IS THE CORRECT BOUND!!!!!
 						System.out.print("\nERROR: Invalid index value. Please enter a valid index value: $");
-						custID = in.readLine();
+						custIndex = Integer.parseInt(in.readLine());
 					}
-					String currCustID =" -1";
-					for(int i = 0; i < customersTable.size(); ++i){
-						if (custIDint == i){ 
-							currCustID = customersTable.get(i).get(0);
-							break;
-						}
-					}
-
-					//int currCustID = customersTable.get(custIndex).get(0);
-					//String currCustIDString = Integer.toString(currCustID);
+           
+           			int currCustID = Integer.parseInt(customersTable.get(custIndex - 1).get(0));
 
 					String getCars = "SELECT owns.car_vin, car.make, car.model, car.year FROM Owns owns, Car car WHERE owns.customer_id = " + currCustID + " AND car.vin = owns.car_vin;";
 					List<List<String>> ownedCarsTable = esql.executeQueryAndReturnResult(getCars);
 
 					if(ownedCarsTable.size() == 0){
-						//Enter data for new car
-
-						AddCar(esql);
-						//Car has been added. We need to now assign it the Owns table somehow
-
-
-						getCars = "SELECT owns.car_vin, car.make, car.model, car.year FROM Owns owns, Car car WHERE owns.customer_id = " + currCustID + " AND car.vin = owns.car_vin;";
-						ownedCarsTable = esql.executeQueryAndReturnResult(getCars);
-						//Save the ID of the customer so when this returns, you can just go to their record
-
-						//add request (continue below)
+						System.out.print("\n!!!!!!!!!!!!!! IF WE SEE THIS, THERE IS A CUSTOMER WITH NO CAR!!!!!!!!!!!!!!\n");
+						//AddCar(esql);
+						return;
 					}
 					//else{
 						//Choose exisitng car or add new one
@@ -731,41 +699,78 @@ public class MechanicShop{
 							System.out.print("\nERROR: Invalid choice! To select a car and create a service request, enter '1'. If you would like to add a new car and enter a service request for it, enter '2': $");
 							newChoice = in.readLine();
 						}
-						if(newChoice == "2"){
+						if(newChoice.equals("2")){
 							
 							AddCar(esql);
-							//need to assign ownership of car to customer. How do we return a value for a function that can't return anything? Global variable?
-							//Get the newest car added
-	
-							getCars = "SELECT MAX(owns.ownership_id) FROM Owns owns, Car car WHERE owns.customer_id = " + currCustID + " AND car.vin = owns.car_vin;";
+							//So we added a car. If we run the below, we should get the latest ownershrip_ID of the car we just put in
+							//MAKE SURE QUERY WORRRRRKSSSSSS
+							getCars = "SELECT MAX(owns.ownership_id) FROM Owns owns, Car car WHERE owns.customer_id = " + currCustID + " AND car.vin = owns.car_vin;"; 
 							List<List<String>> custLastCar = esql.executeQueryAndReturnResult(getCars);
 
 							String ownedID = custLastCar.get(0).get(0);
+							
+							//MAKE SURE QUERY WOOOORKSSSSS
+							getCars = "SELECT car_vin FROM Owns WHERE ownership_id = " + ownedID + ";";
+							List<List<String>> custCar = esql.executeQueryAndReturnResult(getCars);
+							
+							String vin = custCar.get(0).get(0);
 
-							//get the VIN of the car from Owns using the ID
+							//DEBUG
+							System.out.print(vin);
 
 
 							//proceed to add request
 						}
-						else if(newChoice == "1"){
+						else if(newChoice.equals("1")){
 							//Select a car and then create a service request
 							System.out.println("\n Enter the index value of the car you would like to create request for: $");
-							String carIndex = in.readLine();
-							//FIXME: See if "index" is within bounds
+							int carIndex = Integer.parseInt(in.readLine());
+							int carTableSize = ownedCarsTable.size();
+							while(carIndex < 1 || carIndex > carTableSize){ //CHECK TO SEE IF THIS IS THE CORRECT BOUND!!!!!
+								System.out.print("\nERROR: Invalid index value. Please enter a valid index value: $");
+								carIndex = Integer.parseInt(in.readLine());
+							}
 
-							//It is
-							//Generate a rid
-							//Get customer id and keep it to add to insert (we can get it from the Own table where vin matches)
-							//get car vin from exisitng record
-							//Ask for the date
-							//Ask for odometer reading (have a check to see if it's an int)
-							//ask for complaint
+							String vin = customersTable.get(custIndex - 1).get(0);
 
-							//generate query
 
+							
+							//Index is within bounds, parse through and get the VIN of the car we want
 						}
-						// System.out.print("\nEnter index of the car to be serviced: $");
-						// //String in.readLine();
+							//We have the vin from above
+
+							String currRidquery = "SELECT MAX(rid) FROM Service_Request";
+							List<List<String>> currRid = esql.executeQueryAndReturnResult(currRidquery);
+							int rid = Integer.parseInt(currRid.get(0).get(0)) + 1;
+
+							//We now have the rid
+
+							//The date util gives us the date
+							
+
+							//FIXME: ADD DATE UTIL
+							Date currDate = new Date();
+
+							SimpleDateFormat ft = new SimpleDateFormat("MM/dd/yyyy");
+
+							String today = ft.format(currDate);
+
+							//String insertQuery = "INSERT INTO Service_Request " vin;
+							//Get customer id and keep it to add to insert (we can get it from the Own table where vin matches)'
+
+							//FIX THIS BUT IT SHOULD BE GOOD ONCE FIXED
+							//String quickID = "SELECT customer_id FROM Owns WHERE car_vin = " + vin "')"; //FIXME: CHECK THE QUOTES/SINGLE QUOTES!!!!!
+							//List<List<String>> custIDTable = esql.executeQueryAndReturnResult(quickID);
+							//int custIdVal = custIDTable.get(0).get(0);
+
+
+							System.out.println("\n Enter the odometer value of the car you would like to create request for: $");
+							int odometerVal = Integer.parseInt(in.readLine());
+
+							System.out.println("\n Enter the complaint from the customer: $");
+							String complaint = in.readLine();
+
+							//generate query with custIdVal, vin, rid, complaint, and date
 					//}
 
 				}
@@ -776,7 +781,7 @@ public class MechanicShop{
 						System.out.print("\nERROR: Invalid value entered. Please enter 'Y' or 'N': $");
 						choice_3 = in.readLine();
 					}
-					if(choice_3 == "Y"){
+					if(choice_3.equals("Y")){
 						//make new customer
 						AddCustomer(esql);
 						InsertServiceRequest(esql); //try this and see how it works
