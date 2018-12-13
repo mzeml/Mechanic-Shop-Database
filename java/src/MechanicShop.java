@@ -303,8 +303,9 @@ public class MechanicShop{
 		}while (true);
 		return input;
 	}//end readChoice
-	
-	//Added functions to avoid repeating code
+
+//--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------	
+ //Added functions to avoid repeating code
 
 	//For all these, we might need to check for NULLs as well
 	public static boolean phoneCheck(String input){ //FIXME: make sure to accept only format that exisiting data is in!!! (CHECK THE DATA FILES)
@@ -326,8 +327,8 @@ public class MechanicShop{
 			return false;
 		}
 	}
-	public static boolean vinCheck(String input){ //NOTE: VIN HAS TO BE 11 to 17 CHARACTERS LONG. I assume due to index starting at 0, this translates to 10 to 17
-		if(input.length() <= 16 && input.length() > 9 ){
+	public static boolean vinCheck(String input){ //FIXME: VIN HAS TO BE 11 to 17 CHARACTERS LONG. I assume due to index starting at 0, this translates to 10 to 17
+		if(input.length() <= 17 && input.length() > 10 ){
 			return true;
 		}
 		else{
@@ -352,8 +353,16 @@ public class MechanicShop{
 			return false;
 		}
 	}
-	public static boolean experienceCheck(String input){ //ASSUMPTION: Mechanics can have 0 years of experience (newbies) and 99 is the max (they retire otherwise)
-		int inputInt = Integer.parseInt(input);
+ 
+ public static boolean experienceCheck(String input){ //ASSUMPTION: Mechanics can have 0 years of experience (newbies) and 99 is the max (they retire otherwise)
+		if(input.length() == 0)
+    {
+      return false;
+    }
+    if (!input.matches("[0-9]+")) { 
+      return false;
+    }
+    int inputInt = Integer.parseInt(input);
 		if(inputInt >= 0 && inputInt < 100){
 			return true;
 		}
@@ -362,6 +371,13 @@ public class MechanicShop{
 		}
 	}
 	public static boolean yearCheck(String input){
+    if(input.length() == 0)
+    {
+      return false;
+    }
+    if (!input.matches("[0-9]+")) { 
+      return false;
+    }
 		int inputInt = Integer.parseInt(input);
 		if(inputInt >= 1970){
 			return true;
@@ -371,7 +387,8 @@ public class MechanicShop{
 		}
 	}
 	public static boolean boolCheck(String input){
-		if(input == "Y" || input == "N"){
+		if(input.equals("Y") || input.equals("N")){
+//       System.out.print(input);
 			return true;
 		}
 		else{
@@ -387,10 +404,10 @@ public class MechanicShop{
 			return false;
 		}
 	}
-
-
+//--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ 
 	public static void AddCustomer(MechanicShop esql){//1
-		try{	
+ try{	
 				System.out.print("\tEnter first name: $");
 				String f_name = in.readLine();
 				while(!charCheck32(f_name)){
@@ -415,30 +432,24 @@ public class MechanicShop{
 					System.out.print("\nERROR: Address is too long or too short! Enter address again: $");
 					address = in.readLine();
 				}
-				
 		
 				//Gets the largest ID value and adds 1 so we have our ID for new entry
 				String query = "SELECT MAX(id) AS maxID FROM Customer";
 				List<List<String>> maxIDStr = esql.executeQueryAndReturnResult(query);
 				int maxIDint = Integer.parseInt(maxIDStr.get(0).get(0)) + 1;
 
-
-				
-				
-				
-				//FIXME: Not correct format!
-				//esql.executeUpdate("INSERT INTO Customer (id, fname, lname, phone, address) VALUES (" + maxIDint + "," + f_name + "," + l_name + "," + phone + "," + address + ")");
-
-				//Call addCar(esql) as according to ER diagram given, a customer HAS to own at least one car
-				AddCar(esql);
-			}
+        System.out.print("INSERT INTO Customer (id,fname,lname,phone,address) VALUES (" + maxIDint + "," + f_name + "," + l_name + "," + phone + "," + address + ")\n");
+        
+				esql.executeUpdate("INSERT INTO Customer(id,fname,lname,phone,address) VALUES (" + maxIDint + ",'" + f_name + "','" + l_name + "','" + phone + "','" + address + "')");
+        
+        AddCar(esql);
+      }
 			catch(Exception e){
 				System.err.println(e.getMessage());
 			}
 	}
-	
+//------------------------------------------------------------------------------------------------	
 	public static void AddMechanic(MechanicShop esql){//2
-	
 		try{
 			System.out.print("\tEnter first name: $");
 			String f_name = in.readLine();
@@ -472,13 +483,17 @@ public class MechanicShop{
 
      	// 	//Statement statement = conn.createStatement();
      	// 	esql.executeUpdate("INSERT INTO Mechanic " + "VALUES (1,f_name,l_name,experience)");
+      
+              System.out.print("INSERT INTO Mechanic (id,fname,lname,experience) VALUES (" + maxIDint + "," + f_name + "," + l_name + "," + experience + ")\n");
+        
+				esql.executeUpdate("INSERT INTO Mechanic(id,fname,lname,experience) VALUES (" + maxIDint + ",'" + f_name + "','" + l_name + "','" + experience + "')");
+      
 		}
 		catch(Exception e){
 			System.err.println(e.getMessage());
 		}
-
 	}
-	
+//------------------------------------------------------------------------------------------------	
 	public static void AddCar(MechanicShop esql){//3
 		try{
 			System.out.print("\tEnter vehicle identification number (11 to 17 characters long): $"); //ASUMPTION: Vin is between 11 and 17 long according to https://www.autocheck.com/vehiclehistory/autocheck/en/vinbasics
@@ -487,27 +502,17 @@ public class MechanicShop{
 				System.out.print("\nERROR: VIN is less than 11 or greater than 17! Enter VIN again: $");
 				vin = in.readLine();
 			 }
-			//CHECK IF VIN ALREADY EXISTS IN SYSTEM!!!!!
-			 String searchVin = "SELECT DISTINCT vin FROM Car";
+        
+        //CHECK IF VIN ALREADY EXISTS IN SYSTEM!!!!!
+			 String searchVin = "SELECT DISTINCT car.vin FROM Car car WHERE car.vin = '";
+        searchVin += vin + "';";
 			 List<List<String>> existingCarsTable = esql.executeQueryAndReturnResult(searchVin);
-			 if(existingCarsTable.size() != 0){
-				System.out.print("\nERROR: Car already in system! Going back to menu!");
+			 System.out.print(existingCarsTable);
+       if(existingCarsTable.size() != 0 ){
+				System.out.print("\nERROR: Car already in system! Going back to menu!\n");
 				return;
 			 }
-			//  while(existingCarsTable.size() != 0){
-			// 	System.out.print("\nERROR: Car already in system! Enter a different VIN or 'EXIT' to go back to main menu: $");
-			// 	vin = in.readLine();
-			// 	if(vin == "EXIT"){
-			// 		return;
-			// 	}
-			// 	while(!vinCheck(vin)){
-			// 		System.out.print("\nERROR: VIN is less than 11 or greater than 17! Enter VIN again: $");
-			// 		vin = in.readLine();
-			// 	}
-			// 	String searchVin = "SELECT DISTINCT vin FROM Car";
-			//  	List<List<String>> existingCarsTable = esql.executeQueryAndReturnResult(searchVin);
-			//  }
-
+        
      		System.out.print("\tEnter make: $");
 			String make = in.readLine();
 			while(!charCheck32(make)){
@@ -527,8 +532,7 @@ public class MechanicShop{
 				year = in.readLine();
 			}
 
-
-			//How do we know who ownes the car????
+      //How do we know who ownes the car????
 
 			 //Statement statement = conn.createStatement();
 				 //statement.executeUpdate("INSERT INTO Car " + "VALUES (vin,make,model,year)");
@@ -545,12 +549,12 @@ public class MechanicShop{
 
 			if(customersTable.size() == 0){
 				System.out.print("\nNo customer found! Would you like to make a new customer (you can't insert a car without a customer)? (Enter 'Y' or 'N'): $");
-				String choice_1 = in.readLine(); //Note: The vriable is declared a few lines above!
+				String choice_1 = in.readLine(); //Note: The variable is declared a few lines above!
 				while(!boolCheck(choice_1)){
 					System.out.print("\nERROR: Invalid value entered. Please enter 'Y' or 'N': $");
 					choice_1 = in.readLine();
 				}
-				if(choice_1 == "Y"){
+				if(choice_1.equals("Y")){
 					AddCustomer(esql);
 					return;
 				}
@@ -561,35 +565,39 @@ public class MechanicShop{
 			else{ //customers exist
 				for(int i = 0; i < customersTable.size(); ++i){
 					//Index | Fname | Lname | Phone | Address
-
 					System.out.println("INDEX: " + Integer.toString(i + 1) + " FIRST NAME: " + customersTable.get(i).get(1) + " LAST NAME: " + customersTable.get(i).get(2) + " PHONE: " + customersTable.get(i).get(3) + " ADDRESS: " + customersTable.get(i).get(4) + "\n");//CHECK HERE IF OUTOFBOUND OCCURS 
 				}
+        
 				System.out.print("\nIs the customer you are looking for listed? (Enter 'Y' or 'N'): $");
 				String choice_2 = in.readLine();
 				while(!boolCheck(choice_2)){
 					System.out.print("\nERROR: Invalid value entered. Please enter 'Y' or 'N': $");
 					choice_2 = in.readLine();
 				}
-				if(choice_2 == "Y"){
+				if(choice_2.equals("Y")){
 					System.out.print("\nEnter index of the customer: $");
-					String custID = in.readLine();
-					int custIDint = Integer.parseInt(custID);
+					int custIndex = Integer.parseInt(in.readLine());
+                 System.out.print(custIndex + "\n");
 					int tableSize = customersTable.size();
-					while(custIDint < 0 || custIDint > tableSize){ //CHECK TO SEE IF THIS IS THE CORRECT BOUND!!!!!
+              System.out.print(tableSize + "\n");
+					while(custIndex < 1 || custIndex > tableSize){ //CHECK TO SEE IF THIS IS THE CORRECT BOUND!!!!!
 						System.out.print("\nERROR: Invalid index value. Please enter a valid index value: $");
-						custID = in.readLine();
+						custIndex = Integer.parseInt(in.readLine());
 					}
-					String currCustID =" -1";
-					for(int i = 0; i < customersTable.size(); ++i){
-						if (custIDint == i){ 
-							currCustID = customersTable.get(i).get(0);
-							break;
-						}
-					}
-					//Adds car
+           
+           int currCustID = Integer.parseInt(customersTable.get(custIndex - 1).get(0));
 
-					//Check if VIN is already owned by someone (Check the Owns table for that VIN)
-					//If it does, say that the car is already
+					System.out.print("INSERT INTO Car (vin,make,model,year) VALUES (" + vin + "," + make + "," + model + "," + year + ")\n");
+        
+				  esql.executeUpdate("INSERT INTO Car(vin,make,model,year) VALUES ('" + vin + "','" + make + "','" + model + "'," + year + ")");
+          
+          String q = "SELECT MAX(ownership_id) FROM Owns";
+				  List<List<String>> maxIDStr = esql.executeQueryAndReturnResult(q);
+				  int maxIDint = Integer.parseInt(maxIDStr.get(0).get(0)) + 1;
+                                       
+          System.out.print("INSERT INTO Owns(ownership_id,customer_id,car_vin) VALUES (" + maxIDint + "," + currCustID + "," + vin + ")\n");
+        
+				  esql.executeUpdate("INSERT INTO Owns(ownership_id,customer_id,car_vin) VALUES (" + maxIDint + "," + currCustID + ",'" + vin + "')");                             
 
 					//statement.executeUpdate("INSERT INTO Car " + "VALUES (vin,make,model,year)"); //FIXME: Also what happens if a car already exists?
 
@@ -602,7 +610,7 @@ public class MechanicShop{
 				}
 				else{
 					System.out.print("\nWould you like to make a new customer (you can't insert a car without a customer)? (Enter 'Y' or 'N'): $");
-					String choice_3 = in.readLine(); //Note: The vriable is declared a few lines above!
+					String choice_3 = in.readLine(); //Note: The variable is declared a few lines above!
 					while(!boolCheck(choice_3)){
 					System.out.print("\nERROR: Invalid value entered. Please enter 'Y' or 'N': $");
 					choice_3 = in.readLine();
@@ -616,12 +624,20 @@ public class MechanicShop{
 					}
 				}
 			}
+
+
+//			 System.out.print("INSERT INTO Car (vin,make,model,year) VALUES (" + vin + "," + make + "," + model + "," + year + ")\n");
+        
+//				esql.executeUpdate("INSERT INTO Car(vin,make,model,year) VALUES (" + vin + ",'" + make + "','" + model + "','" + year + "')");
+   
+   
 		}
 		catch(Exception e){
 			System.err.println(e.getMessage());
 		}
 	}
-	
+ 
+//------------------------------------------------------------------------------------------------	
 	public static void InsertServiceRequest(MechanicShop esql){//4
 		try{
 			//int custIndex = -1
@@ -778,7 +794,8 @@ public class MechanicShop{
 			System.err.println(e.getMessage());
 		}
 	}
-	
+ 
+//------------------------------------------------------------------------------------------------	
 	public static void CloseServiceRequest(MechanicShop esql) throws Exception{//5
 		try{
 
@@ -805,63 +822,94 @@ public class MechanicShop{
 			System.err.println(e.getMessage());
 		}
 	}
-	
+//------------------------------------------------------------------------------------------------		
 	public static void ListCustomersWithBillLessThan100(MechanicShop esql){//6
 		try{
-//    //POSSIBLY WRONG, FOR ALL CLOSED REQUESTS WITH BILL LOWER THAN 100
-//      			String query = "SELECT close.date, close.comment, close.bill FROM Customer customer, Service_Request service, Closed_Request close WHERE customer.id = service.customer_id AND service.rid = close.rid AND close.bill < 100";
-//      			int rowCount = esql.executeQuery(query);
-//      			System.out.println("total row(s): " + rowCount);
-//    		}catch(Exception e){
-//      			System.err.println(e.getMessage());
-		 }
-		 catch(Exception e){
-			System.err.println(e.getMessage());
-		 }
+   //ASSUMING THAT IT MEANS EACH CUSTOMER'S BILL < 100, AND NOT TOTAL CUSTOMER'S BILL < 100
+     			String query = "SELECT customer.fname, customer.lname ,close.date, close.comment, close.bill FROM Customer customer, Service_Request service, Closed_Request close WHERE customer.id = service.customer_id AND service.rid = close.rid AND close.bill < 100";
+     			List<List<String>> rows = esql.executeQueryAndReturnResult(query);
+     		
+        System.out.println( "-> Customer First Name and Last Name, Closed Request Date, Comment, and Bill");
+       for(int i = 0; i < rows.size(); ++i){
+				System.out.println((i + 1) + ") " + rows.get(i).get(0) + " " + rows.get(i).get(1) + " " + rows.get(i).get(2) + " " + rows.get(i).get(3) + " $" + rows.get(i).get(4));
+      }
+          
+   		}catch(Exception e){
+     			System.err.println(e.getMessage());
+   		}
 	}
 	
 	public static void ListCustomersWithMoreThan20Cars(MechanicShop esql){//7
 		try{
-     	// 		String query = "SELECT car.make, car.model, car.year FROM Car, Service_Request WHERE car.vin = service.car_vin AND car.year < 1995 AND service.odometer < 50000"; //Wrong query
-     	// 		int rowCount = esql.executeQuery(query);
-     	// 		System.out.println("total row(s): " + rowCount);
-   		// }catch(Exception e){
-     	// 		System.err.println(e.getMessage());
-		}
-		catch(Exception e){
-			System.err.println(e.getMessage());
-		}
+     			String query = "SELECT customer.fname, customer.lname FROM Customer customer, (SELECT owns.customer_id FROM Owns owns GROUP BY owns.customer_id HAVING COUNT(owns.customer_id) > 20) AS owntwenty WHERE customer.id = owntwenty.customer_id";
+     			List<List<String>> rows = esql.executeQueryAndReturnResult(query);
+     		  
+            for(int i = 0; i < rows.size(); ++i){
+				System.out.println((i + 1) + ") " + rows.get(i).get(0) + " " + rows.get(i).get(1));
+      }
+            
+   		}catch(Exception e){
+     			System.err.println(e.getMessage());
+   		}
 	}
 	
 	public static void ListCarsBefore1995With50000Milles(MechanicShop esql){//8
 		try{
-	// 		String query = "SELECT car.make, car.model, car.year FROM Car, Service_Request WHERE car.vin = service.car_vin AND car.year < 1995 AND service.odometer < 50000";
-	// 		//System.out.println("total row(s): " + rowCount);
-	//   }catch(Exception e){
-	// 		System.err.println(e.getMessage());
-	   }
-	   catch(Exception e){
-		System.err.println(e.getMessage());
-	   }
-
-	//I think this would work better as it will return no dupes (due to join). I just don't know how to translate into java query
-	//   "SELECT car.vin, car.make, car.model, car.year FROM Car WHERE car.year < 1995"
-	//   "SELECT service.car_vin FROM Service_Request WHERE service.odometer < 50000"
-	//   "INNER JOIN car ON service.car_vin = car.vin"
-
-	//OR we can keep what there is an just have an assumption that we are fine with multiple requests for the same car (I think this is the better option actually)
+	 		String query = "SELECT DISTINCT car.make, car.model, car.year FROM Car car, Service_Request service WHERE car.vin = service.car_vin AND car.year < 1995 AND service.odometer < 50000";
+      List<List<String>> rows = esql.executeQueryAndReturnResult(query);
+	 		
+      for(int i = 0; i < rows.size(); ++i){
+				System.out.println((i + 1) + ") " + rows.get(i).get(0) + " " + rows.get(i).get(1) + " " + rows.get(i).get(2));
+      }                   
+                         
+	   }catch(Exception e){
+	 		System.err.println(e.getMessage());
+    }
 	}
 	
 	public static void ListKCarsWithTheMostServices(MechanicShop esql){//9
-		//Ask user for k
-		//Make sure k does not exceed count(CAR) (run a query to see how many car records in Car table and save value)
+		try{
+   //CHANGE IT UP A BIT MORE
+   //DOES IT WORK?
+   //ERROR CHECK INPUT, MAKE SURE IT IS MORE THAN ZERO
+	 		//String query = "SELECT car.make, car.model, request.blah FROM Car car, (SELECT service.car_vin, COUNT(service.rid) AS blah FROM Service_Request service GROUP BY service.car_vin) AS request WHERE request.car_vin = car.vin ORDER BY request.COUNT(service.rid) DESC LIMIT ";
+             
+      String query = "SELECT car.make, car.model, request.blah FROM Car car, (SELECT service.car_vin, COUNT(service.rid) AS blah FROM Service_Request service GROUP BY service.car_vin) AS request WHERE request.car_vin = car.vin ORDER BY request.blah DESC LIMIT ";
+             
+     //String query = "SELECT make, model, COUNT(*) "
+     
+     
+      System.out.print("\tEnter a value for K: $");
+         String input = in.readLine();
 
-	//
+         while(input.length() == 0 || !input.matches("[0-9]+"))
+         {
+           System.out.print("\tValue incorrectly entered. Enter a value for K: $");
+         input = in.readLine();
+         }
+         query += input;
+      List<List<String>> rows = esql.executeQueryAndReturnResult(query);
+	 		
+      for(int i = 0; i < rows.size(); ++i){
+				System.out.println((i + 1) + ") " + rows.get(i).get(0) + " " + rows.get(i).get(1) + " " + rows.get(i).get(2));
+      }                     
+                         
+	   }catch(Exception e){
+	 		System.err.println(e.getMessage());
+    }
 	}
 	
-	public static void ListCustomersInDescendingOrderOfTheirTotalBill(MechanicShop esql){//9
-		//
-		
+	public static void ListCustomersInDescendingOrderOfTheirTotalBill(MechanicShop esql){//10	
+		try{
+   //CHANGE IT UP A BIT MORE
+   //DOES IT WORK?
+	 		String query = "SELECT customer.fname, customer.lname, SUM(close.bill) FROM Customer customer, (SELECT service.customer_id, SUM(close.bill) FROM Service_Request service, Closed_Request close WHERE service.rid = close.rid) AS all_service WHERE all_service.customer_id = customer.id ORDER BY all_service.SUM(close.bill) DESC";
+      List<List<String>> rows = esql.executeQueryAndReturnResult(query);
+	 		//System.out.println("total row(s): " + rows);
+      //HOW TO PRINT OUT
+	   }catch(Exception e){
+	 		System.err.println(e.getMessage());
+    }
 	}
-	
+ 
 }
