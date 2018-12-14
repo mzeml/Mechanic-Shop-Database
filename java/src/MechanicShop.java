@@ -311,7 +311,7 @@ public class MechanicShop{
 
 	//For all these, we might need to check for NULLs as well
 	public static boolean phoneCheck(String input){ //FIXME: make sure to accept only format that exisiting data is in!!! (CHECK THE DATA FILES)
-		if(input.length() == 13){ //FIXME: Is it less than 13 or less than equal to 13?
+		if(input.length() == 13 && input.charAt(0) == '(' && input.charAt(4) == ')' && input.charAt(8) == '-' ){ //FIXME: Is it less than 13 or less than equal to 13?
 			//FIXME: Check if in correct format (###)###-####
 			
 			return true;
@@ -578,13 +578,18 @@ public class MechanicShop{
 				}
 				if(choice_2.equals("Y")){
 					System.out.print("\nEnter index of the customer: $");
-					int custIndex = Integer.parseInt(in.readLine());
-                 System.out.print(custIndex + "\n");
-					int tableSize = customersTable.size();
-              System.out.print(tableSize + "\n");
-					while(custIndex < 1 || custIndex > tableSize){ //CHECK TO SEE IF THIS IS THE CORRECT BOUND!!!!!
-						System.out.print("\nERROR: Invalid index value. Please enter a valid index value: $");
-						custIndex = Integer.parseInt(in.readLine());
+           String indexLength = in.readLine();
+              while(indexLength.length() == 0 || !indexLength.matches("[0-9]+")){
+                  System.out.print("\nInvalid length! Enter index of the customer: $");
+					        indexLength = in.readLine();
+               }
+               int custIndex = Integer.parseInt(indexLength);
+               System.out.print(custIndex + "\n");
+               int tableSize = customersTable.size();
+               System.out.print(tableSize + "\n");
+               while(custIndex < 1 || custIndex > tableSize){ //CHECK TO SEE IF THIS IS THE CORRECT BOUND!!!!!
+               System.out.print("\nERROR: Invalid index value. Please enter a valid index value: $");
+               custIndex = Integer.parseInt(in.readLine());
 					}
            
            int currCustID = Integer.parseInt(customersTable.get(custIndex - 1).get(0));
@@ -671,6 +676,7 @@ public class MechanicShop{
 						return;
 					}
 					else{
+             System.out.print("\nreturning to menu\n");
 						return; //go to menu
 					}
 			}
@@ -690,7 +696,12 @@ public class MechanicShop{
 				
 				if(choice_2.equals("Y")){
 					System.out.print("\nEnter index of the customer: $");
-					int custIndex = Integer.parseInt(in.readLine());
+           String indexLength = in.readLine();
+              while(indexLength.length() == 0 || !indexLength.matches("[0-9]+")){
+                  System.out.print("\nInvalid length! Enter index of the customer: $");
+					        indexLength = in.readLine();
+               }
+               int custIndex = Integer.parseInt(indexLength);
 					//int custIDint = Integer.parseInt(custID);
 					int tableSize = customersTable.size();
 					while(custIndex < 1 || custIndex > tableSize){ //CHECK TO SEE IF THIS IS THE CORRECT BOUND!!!!!
@@ -790,7 +801,7 @@ public class MechanicShop{
 							custIDVal = Integer.parseInt(custIDTable.get(0).get(0));
 
 
-							System.out.print0("\n Enter the odometer value of the car you would like to create request for: $");
+							System.out.print("\n Enter the odometer value of the car you would like to create request for: $");
 							int odometerVal = Integer.parseInt(in.readLine());
 
 							System.out.print("\n Enter the complaint from the customer: $");
@@ -822,6 +833,7 @@ public class MechanicShop{
 						return;
 					}
 					else{
+               System.out.print("\nreturning to menu\n");
 						return; //go to menu
 					}
 				}
@@ -837,10 +849,14 @@ public class MechanicShop{
 //---------------------------------------------------------------------------------------------------------------------------------------------------------------------------	
 	public static void CloseServiceRequest(MechanicShop esql) throws Exception{//5
 		try{
-				//Ask for service request number and employee ID
+						//Ask for service request number and employee ID
           System.out.print( "\tEnter service request number: ");
-		  //String serveRequestNum = in.readLine();
-		  int serveRequestNum = Integer.parseInt(in.readLine());
+		  String serveRequestString = in.readLine();
+      while(serveRequestString.length() == 0 || !serveRequestString.matches("[0-9]+")){
+                  System.out.print("\nInvalid number inputted. Enter a valid service request number: $");
+					        serveRequestString = in.readLine();
+               }
+		  int serveRequestNum = Integer.parseInt(serveRequestString);
           //int temp = Integer.parseInt(serveRequestNum);
 		  //while(serveRequestNum.length() == 0 || !serveRequestNum.matches("[0-9]+"))
 		  while(serveRequestNum < 0 || serveRequestNum > 100000)
@@ -871,8 +887,8 @@ public class MechanicShop{
 				System.out.print("\nNo service requests found! Returning to menu\n");
 						return; //go to menu
 		}
-		System.out.print("\n SOMETHING FOUND\n");
-		System.out.print(serviceTable.size() + " " + serviceTable.get(0).get(0) + " " + serviceTable.get(0).get(1) + " " + serviceTable.get(0).get(2) + "\n");								  
+		System.out.print("\n SERVICE REQUEST FOUND\n");
+		System.out.print("Request: rid =" + serviceTable.get(0).get(0) + ", customer ID =" + serviceTable.get(0).get(1) + ", car vin =" + serviceTable.get(0).get(2) + "\n");								  
 	
 	String findEmployeeID = "SELECT * FROM Mechanic mechanic WHERE mechanic.id = '" + employeeID + "';";
 		  List<List<String>> employeeTable = esql.executeQueryAndReturnResult(findEmployeeID);
@@ -881,8 +897,8 @@ public class MechanicShop{
 				System.out.print("\nNo employeeID found! Returning to menu\n");
 						return; //go to menu
 	}
-	System.out.print("\nEMP FOUND\n");
-	System.out.print(employeeTable.size() + " " + employeeTable.get(0).get(0) + "\n");
+	System.out.print("\nEMPLOYEE ID FOUND\n");
+	System.out.print("Mechanic: mechanic ID = " + employeeTable.get(0).get(0) + "\n");
  
  
        String query = "SELECT MAX(wid) AS maxID FROM Closed_Request";
@@ -896,10 +912,20 @@ public class MechanicShop{
 				//ask for comment
         System.out.print( "\tEnter comment: ");
         String comment = in.readLine();
+        while(comment.length() == 0)
+          {
+            System.out.print("\nInvalid length. Enter comment: ");
+            comment = in.readLine();
+		      }
 				//ask for bill
         System.out.print( "\tEnter bill: $");
         String bill = in.readLine();
- 
+        while(bill.length() == 0 || !bill.matches("[0-9]+"))
+          {
+            System.out.print("\nInvalid input. Enter bill number: $");
+            bill = in.readLine();
+		      }
+        
        System.out.print("INSERT INTO Closed_Request(wid,rid,mid,date,comment,bill) VALUES (" + maxIDint + "," + serveRequestNum + "," + employeeID + "," + today + "," + comment + "," + bill + ")\n");
 			esql.executeUpdate("INSERT INTO Closed_Request(wid,rid,mid,date,comment,bill) VALUES (" + maxIDint + ",'" + serveRequestNum + "','" + employeeID + "','" + today + "','" + comment + "','" + bill + "')");
 		}
@@ -953,13 +979,7 @@ public class MechanicShop{
 	}
 	
 	public static void ListKCarsWithTheMostServices(MechanicShop esql){//9
-		try{
-   //CHANGE IT UP A BIT MORE
-   //DOES IT WORK?
-	 		//String query = "SELECT car.make, car.model, request.blah FROM Car car, (SELECT service.car_vin, COUNT(service.rid) AS blah FROM Service_Request service GROUP BY service.car_vin) AS request WHERE request.car_vin = car.vin ORDER BY request.COUNT(service.rid) DESC LIMIT ";
-             
-      //String query = "SELECT car.make, car.model, request.blah FROM Car car, (SELECT service.car_vin, COUNT(service.rid) AS blah FROM Service_Request service GROUP BY service.car_vin) AS request WHERE request.car_vin = car.vin ORDER BY request.blah DESC LIMIT ";
-       
+		try{       
        String query = "SELECT car.make, car.model, COUNT(*) FROM Service_Request service, Car car WHERE service.car_vin = car.vin GROUP BY car.vin ORDER BY COUNT(*) DESC LIMIT ";      
      
       System.out.print("\tEnter a value for K: $");
@@ -983,8 +1003,7 @@ public class MechanicShop{
 	
 	public static void ListCustomersInDescendingOrderOfTheirTotalBill(MechanicShop esql){//10	
 		try{
-   //CHANGE IT UP A BIT MORE
-   //DOES IT WORK?
+   //IS IT POSSIBLE TO SIMPLIFY THIS QUERY?
 	 		String query = "SELECT customer.fname, customer.lname, billSum FROM Customer customer, (SELECT SUM(close.bill) AS billSum, service.customer_id FROM Service_Request service, Closed_Request close WHERE service.rid = close.rid GROUP BY service.customer_id) AS all_request WHERE all_request.customer_id = customer.id ORDER BY all_request.billSum DESC";
       List<List<String>> rows = esql.executeQueryAndReturnResult(query);
 	 		
