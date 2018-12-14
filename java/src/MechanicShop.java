@@ -837,58 +837,71 @@ public class MechanicShop{
 //---------------------------------------------------------------------------------------------------------------------------------------------------------------------------	
 	public static void CloseServiceRequest(MechanicShop esql) throws Exception{//5
 		try{
-			//Ask for service request number and employee ID
+				//Ask for service request number and employee ID
           System.out.print( "\tEnter service request number: ");
-          String serveRequestNum = in.readLine();
+		  //String serveRequestNum = in.readLine();
+		  int serveRequestNum = Integer.parseInt(in.readLine());
           //int temp = Integer.parseInt(serveRequestNum);
-          while(serveRequestNum.length() == 0 || !serveRequestNum.matches("[0-9]+"))
+		  //while(serveRequestNum.length() == 0 || !serveRequestNum.matches("[0-9]+"))
+		  while(serveRequestNum < 0 || serveRequestNum > 100000)
           {
             System.out.print("\nInvalid number inputted. Enter service request number: ");
-            serveRequestNum = in.readLine();
-          }
-          System.out.println( "\tEnter employee ID: ");
+			//serveRequestNum = in.readLine();
+			serveRequestNum = Integer.parseInt(in.readLine());
+		  }
+		  
+		  //FIXME: Check if Service request number exists in closed_request as rid
+
+
+          System.out.print( "\tEnter employee ID: ");
           String employeeID = in.readLine();
           while(employeeID.length() == 0 || !employeeID.matches("[0-9]+"))
           {
             System.out.print("\nInvalid number inputted. Enter employee ID: ");
             employeeID = in.readLine();
-          }
-				//check if it is a valid input
-					//Does the employee ID exist in the database?
-					//Does the request exist?
-				//search the database
-				//if not found, say that
-				//else, continue
-        
-        
-			//String serveRequestNumQuery = "SELECT * FROM Mechanic mechanic";
-			//List<List<String>> customersTable = esql.executeQueryAndReturnResult(findCustomerQuery);
-			//if(customersTable.size() == 0){
-      
-      
-			//If ID and request number are valid
-			//Create a closed_request
-				//Generate a wid 
-        String query = "SELECT MAX(id) AS maxID FROM Mechanic";
+		  }
+		  System.out.print("\nRUNNING SEARCH");
+		  //String findServiceRequest = "SELECT * FROM Service_Request WHERE rid = " + serveRequestNum + ";";
+		  String findServiceRequest = "SELECT * FROM Service_Request WHERE rid = " + serveRequestNum + ";";
+		  List<List<String>> serviceTable = esql.executeQueryAndReturnResult(findServiceRequest);
+
+		  System.out.print("\n SEARCH HAS RUN");
+		  			
+		if(serviceTable.size() == 0){
+				System.out.print("\nNo service requests found! Returning to menu\n");
+						return; //go to menu
+		}
+		System.out.print("\n SOMETHING FOUND\n");
+		System.out.print(serviceTable.size() + " " + serviceTable.get(0).get(0) + " " + serviceTable.get(0).get(1) + " " + serviceTable.get(0).get(2) + "\n");								  
+	
+	String findEmployeeID = "SELECT * FROM Mechanic mechanic WHERE mechanic.id = '" + employeeID + "';";
+		  List<List<String>> employeeTable = esql.executeQueryAndReturnResult(findEmployeeID);
+		  				
+	if(employeeTable.size() == 0){
+				System.out.print("\nNo employeeID found! Returning to menu\n");
+						return; //go to menu
+	}
+	System.out.print("\nEMP FOUND\n");
+	System.out.print(employeeTable.size() + " " + employeeTable.get(0).get(0) + "\n");
+ 
+ 
+       String query = "SELECT MAX(wid) AS maxID FROM Closed_Request";
 		    List<List<String>> maxIDStr = esql.executeQueryAndReturnResult(query);
 		    int maxIDint = Integer.parseInt(maxIDStr.get(0).get(0)) + 1;
-				//copy over request number/ID
-				//copy over mechanic id as mid
-				//ask for a closing date
-        Date currDate = new Date();
+ 
+       Date currDate = new Date();
         SimpleDateFormat ft = new SimpleDateFormat("MM/dd/yyyy");
         String today = ft.format(currDate);
 					//Make sure the closing date is not before the service request date (assuming requests can be closed on the same day)
 				//ask for comment
-        System.out.println( "\tEnter comment: ");
+        System.out.print( "\tEnter comment: ");
         String comment = in.readLine();
 				//ask for bill
-        System.out.println( "\tEnter bill: $");
+        System.out.print( "\tEnter bill: $");
         String bill = in.readLine();
-			//package up and create query
-      System.out.print("INSERT INTO Closed_Request(wid,rid,mid,date,comment,bill) VALUES (" + maxIDint + "," + serveRequestNum + "," + employeeID + "," + today + "," + comment + "," + bill + ")\n");
-        
-				esql.executeUpdate("INSERT INTO Closed_Request(wid,rid,mid,date,comment,bill) VALUES (" + maxIDint + ",'" + serveRequestNum + "','" + employeeID + "','" + today + "','" + comment + "','" + bill + "')");
+ 
+       System.out.print("INSERT INTO Closed_Request(wid,rid,mid,date,comment,bill) VALUES (" + maxIDint + "," + serveRequestNum + "," + employeeID + "," + today + "," + comment + "," + bill + ")\n");
+			esql.executeUpdate("INSERT INTO Closed_Request(wid,rid,mid,date,comment,bill) VALUES (" + maxIDint + ",'" + serveRequestNum + "','" + employeeID + "','" + today + "','" + comment + "','" + bill + "')");
 		}
 		catch(Exception e){
 			System.err.println(e.getMessage());
