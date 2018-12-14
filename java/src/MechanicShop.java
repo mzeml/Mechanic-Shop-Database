@@ -312,7 +312,6 @@ public class MechanicShop{
 	//For all these, we might need to check for NULLs as well
 	public static boolean phoneCheck(String input){ //FIXME: make sure to accept only format that exisiting data is in!!! (CHECK THE DATA FILES)
 		if(input.length() == 13 && input.charAt(0) == '(' && input.charAt(4) == ')' && input.charAt(8) == '-' ){ //FIXME: Is it less than 13 or less than equal to 13?
-			//FIXME: Check if in correct format (###)###-####
 			
 			return true;
 		}
@@ -481,7 +480,7 @@ public class MechanicShop{
 		List<List<String>> maxIDStr = esql.executeQueryAndReturnResult(query);
 		int maxIDint = Integer.parseInt(maxIDStr.get(0).get(0)) + 1;
 
-		//FIXME: Add insert query
+
 
      	// 	//Statement statement = conn.createStatement();
      	// 	esql.executeUpdate("INSERT INTO Mechanic " + "VALUES (1,f_name,l_name,experience)");
@@ -734,13 +733,13 @@ public class MechanicShop{
 							
 							AddCar(esql);
 							//So we added a car. If we run the below, we should get the latest ownershrip_ID of the car we just put in
-							//MAKE SURE QUERY WORRRRRKSSSSSS
+							
 							getCars = "SELECT MAX(owns.ownership_id) FROM Owns owns, Car car WHERE owns.customer_id = " + currCustID + " AND car.vin = owns.car_vin;"; 
 							List<List<String>> custLastCar = esql.executeQueryAndReturnResult(getCars);
 
 							String ownedID = custLastCar.get(0).get(0);
 							
-							//MAKE SURE QUERY WOOOORKSSSSS
+							
 							getCars = "SELECT car_vin FROM Owns WHERE ownership_id = " + ownedID + ";";
 							List<List<String>> custCar = esql.executeQueryAndReturnResult(getCars);
 							
@@ -757,7 +756,7 @@ public class MechanicShop{
                //System.out.println("ELSE IF");
 							System.out.print("\n Enter the index value of the car you would like to create request for: $");
                                                
-							//FIXME!!!!!!! The inputs are on a seperate line? Change System.out.printLine() to System.out.print()
+							
                                         
               int carIndex = Integer.parseInt(in.readLine());
                //System.out.println(carIndex);
@@ -785,7 +784,7 @@ public class MechanicShop{
 							//The date util gives us the date
 							
 
-							//FIXME: ADD DATE UTIL
+							//ADD DATE UTIL
 							Date currDate = new Date();
 
 							SimpleDateFormat ft = new SimpleDateFormat("MM/dd/yyyy");
@@ -795,8 +794,8 @@ public class MechanicShop{
 							//String insertQuery = "INSERT INTO Service_Request " vin;
 							//Get customer id and keep it to add to insert (we can get it from the Own table where vin matches)'
 
-							//FIX THIS BUT IT SHOULD BE GOOD ONCE FIXED
-							String quickID = "SELECT customer_id FROM Owns WHERE car_vin = '" + vin + "';"; //FIXME: CHECK THE QUOTES/SINGLE QUOTES!!!!!
+							
+							String quickID = "SELECT customer_id FROM Owns WHERE car_vin = '" + vin + "';";
 							List<List<String>> custIDTable = esql.executeQueryAndReturnResult(quickID);
 							custIDVal = Integer.parseInt(custIDTable.get(0).get(0));
 
@@ -866,7 +865,6 @@ public class MechanicShop{
 			serveRequestNum = Integer.parseInt(in.readLine());
 		  }
 		  
-		  //FIXME: Check if Service request number exists in closed_request as rid
 
 
           System.out.print( "\tEnter employee ID: ");
@@ -925,7 +923,6 @@ public class MechanicShop{
             System.out.print("\nInvalid input. Enter bill number: $");
             bill = in.readLine();
 		      }
-        
        System.out.print("INSERT INTO Closed_Request(wid,rid,mid,date,comment,bill) VALUES (" + maxIDint + "," + serveRequestNum + "," + employeeID + "," + today + "," + comment + "," + bill + ")\n");
 			esql.executeUpdate("INSERT INTO Closed_Request(wid,rid,mid,date,comment,bill) VALUES (" + maxIDint + ",'" + serveRequestNum + "','" + employeeID + "','" + today + "','" + comment + "','" + bill + "')");
 		}
@@ -937,6 +934,7 @@ public class MechanicShop{
 	public static void ListCustomersWithBillLessThan100(MechanicShop esql){//6
 		try{
    //ASSUMING THAT IT MEANS EACH CUSTOMER'S BILL < 100, AND NOT TOTAL CUSTOMER'S BILL < 100
+   //Look through closed requests bills and if that number is < 100, store the customers name that belongs to that customers sid
      			String query = "SELECT customer.fname, customer.lname ,close.date, close.comment, close.bill FROM Customer customer, Service_Request service, Closed_Request close WHERE customer.id = service.customer_id AND service.rid = close.rid AND close.bill < 100";
      			List<List<String>> rows = esql.executeQueryAndReturnResult(query);
      		
@@ -952,7 +950,9 @@ public class MechanicShop{
 	
 	public static void ListCustomersWithMoreThan20Cars(MechanicShop esql){//7
 		try{
-     			String query = "SELECT customer.fname, customer.lname FROM Customer customer, (SELECT owns.customer_id FROM Owns owns GROUP BY owns.customer_id HAVING COUNT(owns.customer_id) > 20) AS owntwenty WHERE customer.id = owntwenty.customer_id";
+         //For each customer, count the number of car vins they have in the owns relation. If the customer sid is connected to more than 20 vins, then store it in a list.
+
+          String query = "SELECT customer.fname, customer.lname FROM (SELECT owns.customer_id FROM Owns owns GROUP BY owns.customer_id HAVING COUNT(owns.customer_id) > 20) AS owntwenty, Customer customer WHERE customer.id = owntwenty.customer_id";
      			List<List<String>> rows = esql.executeQueryAndReturnResult(query);
      		  
             for(int i = 0; i < rows.size(); ++i){
@@ -966,6 +966,8 @@ public class MechanicShop{
 	
 	public static void ListCarsBefore1995With50000Milles(MechanicShop esql){//8
 		try{
+       //For each car, check to see if the cars year is less than 1995. Then, check to see if the odometer reading for those cars service requests is lower than 50000 miles
+
 	 		String query = "SELECT DISTINCT car.make, car.model, car.year FROM Car car, Service_Request service WHERE car.vin = service.car_vin AND car.year < 1995 AND service.odometer < 50000";
       List<List<String>> rows = esql.executeQueryAndReturnResult(query);
 	 		
@@ -979,7 +981,8 @@ public class MechanicShop{
 	}
 	
 	public static void ListKCarsWithTheMostServices(MechanicShop esql){//9
-		try{       
+		try{      
+      //Count the the number of service requests for each vin. Order cars based on number of service requests with the car with the most service requests at the top. User input for k determines how far you loop through the car table
        String query = "SELECT car.make, car.model, COUNT(*) FROM Service_Request service, Car car WHERE service.car_vin = car.vin GROUP BY car.vin ORDER BY COUNT(*) DESC LIMIT ";      
      
       System.out.print("\tEnter a value for K: $");
@@ -1003,8 +1006,9 @@ public class MechanicShop{
 	
 	public static void ListCustomersInDescendingOrderOfTheirTotalBill(MechanicShop esql){//10	
 		try{
-   //IS IT POSSIBLE TO SIMPLIFY THIS QUERY?
-	 		String query = "SELECT customer.fname, customer.lname, billSum FROM Customer customer, (SELECT SUM(close.bill) AS billSum, service.customer_id FROM Service_Request service, Closed_Request close WHERE service.rid = close.rid GROUP BY service.customer_id) AS all_request WHERE all_request.customer_id = customer.id ORDER BY all_request.billSum DESC";
+   //Sum up all of the bills for each customer. Order customers based on total bill with the highest bill at the top
+
+	 		String query = "SELECT customer.fname, customer.lname, billSum FROM (SELECT SUM(close.bill) AS billSum, service.customer_id FROM Service_Request service, Closed_Request close WHERE service.rid = close.rid GROUP BY service.customer_id) AS all_request, Customer customer WHERE all_request.customer_id = customer.id ORDER BY all_request.billSum DESC";
       List<List<String>> rows = esql.executeQueryAndReturnResult(query);
 	 		
       for(int i = 0; i < rows.size(); ++i){
