@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Date;
 import java.text.SimpleDateFormat;
+
 /**
  * This class defines a simple embedded SQL utility class that is designed to
  * work with PostgreSQL JDBC drivers.
@@ -494,7 +495,7 @@ public class MechanicShop{
 			System.err.println(e.getMessage());
 		}
 	}
-//------------------------------------------------------------------------------------------------	
+//--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------	
 	public static void AddCar(MechanicShop esql){//3
 		try{
 			System.out.print("\tEnter vehicle identification number (11 to 17 characters long): $"); //ASUMPTION: Vin is between 11 and 17 long according to https://www.autocheck.com/vehiclehistory/autocheck/en/vinbasics
@@ -533,7 +534,7 @@ public class MechanicShop{
 				year = in.readLine();
 			}
 
-      //How do we know who ownes the car????
+      //How do we know who owns the car????
 
 			 //Statement statement = conn.createStatement();
 				 //statement.executeUpdate("INSERT INTO Car " + "VALUES (vin,make,model,year)");
@@ -578,9 +579,9 @@ public class MechanicShop{
 				if(choice_2.equals("Y")){
 					System.out.print("\nEnter index of the customer: $");
 					int custIndex = Integer.parseInt(in.readLine());
-                // System.out.print(custIndex + "\n");
+                 System.out.print(custIndex + "\n");
 					int tableSize = customersTable.size();
-              //System.out.print(tableSize + "\n");
+              System.out.print(tableSize + "\n");
 					while(custIndex < 1 || custIndex > tableSize){ //CHECK TO SEE IF THIS IS THE CORRECT BOUND!!!!!
 						System.out.print("\nERROR: Invalid index value. Please enter a valid index value: $");
 						custIndex = Integer.parseInt(in.readLine());
@@ -588,17 +589,26 @@ public class MechanicShop{
            
            int currCustID = Integer.parseInt(customersTable.get(custIndex - 1).get(0));
 
-				System.out.print("INSERT INTO Car (vin,make,model,year) VALUES (" + vin + "," + make + "," + model + "," + year + ")\n");
-				esql.executeUpdate("INSERT INTO Car(vin,make,model,year) VALUES ('" + vin + "','" + make + "','" + model + "'," + year + ")");
+					System.out.print("INSERT INTO Car (vin,make,model,year) VALUES (" + vin + "," + make + "," + model + "," + year + ")\n");
+        
+				  esql.executeUpdate("INSERT INTO Car(vin,make,model,year) VALUES ('" + vin + "','" + make + "','" + model + "'," + year + ")");
           
           String q = "SELECT MAX(ownership_id) FROM Owns";
-				List<List<String>> maxIDStr = esql.executeQueryAndReturnResult(q);
-				int maxIDint = Integer.parseInt(maxIDStr.get(0).get(0)) + 1;
+				  List<List<String>> maxIDStr = esql.executeQueryAndReturnResult(q);
+				  int maxIDint = Integer.parseInt(maxIDStr.get(0).get(0)) + 1;
                                        
-          		System.out.print("INSERT INTO Owns(ownership_id,customer_id,car_vin) VALUES (" + maxIDint + "," + currCustID + "," + vin + ")\n");
+          System.out.print("INSERT INTO Owns(ownership_id,customer_id,car_vin) VALUES (" + maxIDint + "," + currCustID + "," + vin + ")\n");
         
-				esql.executeUpdate("INSERT INTO Owns(ownership_id,customer_id,car_vin) VALUES (" + maxIDint + "," + currCustID + ",'" + vin + "')");                             
+				  esql.executeUpdate("INSERT INTO Owns(ownership_id,customer_id,car_vin) VALUES (" + maxIDint + "," + currCustID + ",'" + vin + "')");                             
 
+					//statement.executeUpdate("INSERT INTO Car " + "VALUES (vin,make,model,year)"); //FIXME: Also what happens if a car already exists?
+
+					//Adding an Owns record
+					//Find the largest OwnsID (ownership_id)
+					//Insert new Owns record using the customer ID, VIN, and ownership ID
+						//currCustID is the customerID (I think). Use this in the owns function!
+				
+					//statement.executeUpdate("INSERT INTO Owns " + "VALUES (vin,make,model,year)")
 				}
 				else{
 					System.out.print("\nWould you like to make a new customer (you can't insert a car without a customer)? (Enter 'Y' or 'N'): $");
@@ -607,7 +617,7 @@ public class MechanicShop{
 					System.out.print("\nERROR: Invalid value entered. Please enter 'Y' or 'N': $");
 					choice_3 = in.readLine();
 					}
-					if(choice_3.equals("Y")){
+					if(choice_3 == "Y"){
 						AddCustomer(esql);
 						return;
 					}
@@ -616,15 +626,25 @@ public class MechanicShop{
 					}
 				}
 			}
+
+
+//			 System.out.print("INSERT INTO Car (vin,make,model,year) VALUES (" + vin + "," + make + "," + model + "," + year + ")\n");
+        
+//				esql.executeUpdate("INSERT INTO Car(vin,make,model,year) VALUES (" + vin + ",'" + make + "','" + model + "','" + year + "')");
+   
+   
 		}
 		catch(Exception e){
 			System.err.println(e.getMessage());
 		}
 	}
  
-//------------------------------------------------------------------------------------------------	
+//-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------	
 	public static void InsertServiceRequest(MechanicShop esql){//4
 		try{
+   //DECLARE VARIABLES HERE SINCE THEY DON'T WORK BELOW
+   String vin = "";
+   int custIDVal = 0;
 			//int custIndex = -1
 			System.out.print("\tEnter last name of customer: $");
 				String l_name = in.readLine();
@@ -638,7 +658,7 @@ public class MechanicShop{
 			if(customersTable.size() == 0){
 				//No customer found. Ask if insert new one? If yes, do it and continue. Else, go back to menu
 				System.out.print("\nNo customer found! Would you like to make a new customer? (Enter 'Y' or 'N'): $");
-				String choice_1 = in.readLine(); //Note: The vriable is declared a few lines above!
+				String choice_1 = in.readLine(); //Note: The variable is declared a few lines above!
 					while(!boolCheck(choice_1)){
 						System.out.print("\nERROR: Invalid value entered. Please enter 'Y' or 'N': $");
 						choice_1 = in.readLine();
@@ -713,7 +733,7 @@ public class MechanicShop{
 							getCars = "SELECT car_vin FROM Owns WHERE ownership_id = " + ownedID + ";";
 							List<List<String>> custCar = esql.executeQueryAndReturnResult(getCars);
 							
-							String vin = custCar.get(0).get(0);
+							vin = custCar.get(0).get(0);
 
 							//DEBUG
 							System.out.print(vin);
@@ -721,17 +741,23 @@ public class MechanicShop{
 
 							//proceed to add request
 						}
-						else if(newChoice.equals("1")){
+						if(newChoice.equals("1")){
 							//Select a car and then create a service request
-							System.out.println("\n Enter the index value of the car you would like to create request for: $");
-							int carIndex = Integer.parseInt(in.readLine());
+               //System.out.println("ELSE IF");
+							System.out.print("\n Enter the index value of the car you would like to create request for: $");
+                                               
+							//FIXME!!!!!!! The inputs are on a seperate line? Change System.out.printLine() to System.out.print()
+                                        
+              int carIndex = Integer.parseInt(in.readLine());
+               //System.out.println(carIndex);
 							int carTableSize = ownedCarsTable.size();
 							while(carIndex < 1 || carIndex > carTableSize){ //CHECK TO SEE IF THIS IS THE CORRECT BOUND!!!!!
 								System.out.print("\nERROR: Invalid index value. Please enter a valid index value: $");
 								carIndex = Integer.parseInt(in.readLine());
 							}
 
-							String vin = customersTable.get(custIndex - 1).get(0);
+							vin = ownedCarsTable.get(carIndex - 1).get(0);
+                                                 //System.out.println(vin);
 
 
 							
@@ -759,18 +785,26 @@ public class MechanicShop{
 							//Get customer id and keep it to add to insert (we can get it from the Own table where vin matches)'
 
 							//FIX THIS BUT IT SHOULD BE GOOD ONCE FIXED
-							//String quickID = "SELECT customer_id FROM Owns WHERE car_vin = " + vin "')"; //FIXME: CHECK THE QUOTES/SINGLE QUOTES!!!!!
-							//List<List<String>> custIDTable = esql.executeQueryAndReturnResult(quickID);
-							//int custIdVal = custIDTable.get(0).get(0);
+							String quickID = "SELECT customer_id FROM Owns WHERE car_vin = '" + vin + "';"; //FIXME: CHECK THE QUOTES/SINGLE QUOTES!!!!!
+							List<List<String>> custIDTable = esql.executeQueryAndReturnResult(quickID);
+							custIDVal = Integer.parseInt(custIDTable.get(0).get(0));
 
 
-							System.out.println("\n Enter the odometer value of the car you would like to create request for: $");
+							System.out.print0("\n Enter the odometer value of the car you would like to create request for: $");
 							int odometerVal = Integer.parseInt(in.readLine());
 
-							System.out.println("\n Enter the complaint from the customer: $");
+							System.out.print("\n Enter the complaint from the customer: $");
 							String complaint = in.readLine();
 
 							//generate query with custIdVal, vin, rid, complaint, and date
+                                    
+                                    
+         
+         
+         
+             System.out.print("INSERT INTO Service_Request(rid,customer_id,car_vin,date,odometer,complain) VALUES (" + rid + "," + custIDVal + "," + vin + "," + today + "," + odometerVal + "," + complaint + ")\n");
+        
+		        esql.executeUpdate("INSERT INTO Service_Request(rid,customer_id,car_vin,date,odometer,complain) VALUES (" + rid + ",'" + custIDVal + "','" + vin + "','" + today + "','" + odometerVal + "','" + complaint + "')");
 					//}
 
 				}
@@ -800,34 +834,67 @@ public class MechanicShop{
 		}
 	}
  
-//------------------------------------------------------------------------------------------------	
+//---------------------------------------------------------------------------------------------------------------------------------------------------------------------------	
 	public static void CloseServiceRequest(MechanicShop esql) throws Exception{//5
 		try{
-
 			//Ask for service request number and employee ID
+          System.out.print( "\tEnter service request number: ");
+          String serveRequestNum = in.readLine();
+          //int temp = Integer.parseInt(serveRequestNum);
+          while(serveRequestNum.length() == 0 || !serveRequestNum.matches("[0-9]+"))
+          {
+            System.out.print("\nInvalid number inputted. Enter service request number: ");
+            serveRequestNum = in.readLine();
+          }
+          System.out.println( "\tEnter employee ID: ");
+          String employeeID = in.readLine();
+          while(employeeID.length() == 0 || !employeeID.matches("[0-9]+"))
+          {
+            System.out.print("\nInvalid number inputted. Enter employee ID: ");
+            employeeID = in.readLine();
+          }
 				//check if it is a valid input
 					//Does the employee ID exist in the database?
 					//Does the request exist?
 				//search the database
 				//if not found, say that
 				//else, continue
-			
+        
+        
+			//String serveRequestNumQuery = "SELECT * FROM Mechanic mechanic";
+			//List<List<String>> customersTable = esql.executeQueryAndReturnResult(findCustomerQuery);
+			//if(customersTable.size() == 0){
+      
+      
 			//If ID and request number are valid
 			//Create a closed_request
 				//Generate a wid 
+        String query = "SELECT MAX(id) AS maxID FROM Mechanic";
+		    List<List<String>> maxIDStr = esql.executeQueryAndReturnResult(query);
+		    int maxIDint = Integer.parseInt(maxIDStr.get(0).get(0)) + 1;
 				//copy over request number/ID
 				//copy over mechanic id as mid
 				//ask for a closing date
+        Date currDate = new Date();
+        SimpleDateFormat ft = new SimpleDateFormat("MM/dd/yyyy");
+        String today = ft.format(currDate);
 					//Make sure the closing date is not before the service request date (assuming requests can be closed on the same day)
 				//ask for comment
+        System.out.println( "\tEnter comment: ");
+        String comment = in.readLine();
 				//ask for bill
+        System.out.println( "\tEnter bill: $");
+        String bill = in.readLine();
 			//package up and create query
+      System.out.print("INSERT INTO Closed_Request(wid,rid,mid,date,comment,bill) VALUES (" + maxIDint + "," + serveRequestNum + "," + employeeID + "," + today + "," + comment + "," + bill + ")\n");
+        
+				esql.executeUpdate("INSERT INTO Closed_Request(wid,rid,mid,date,comment,bill) VALUES (" + maxIDint + ",'" + serveRequestNum + "','" + employeeID + "','" + today + "','" + comment + "','" + bill + "')");
 		}
 		catch(Exception e){
 			System.err.println(e.getMessage());
 		}
 	}
-//------------------------------------------------------------------------------------------------		
+//--------------------------------------------------------------------------------------------------------------------------------------------------------------------------		
 	public static void ListCustomersWithBillLessThan100(MechanicShop esql){//6
 		try{
    //ASSUMING THAT IT MEANS EACH CUSTOMER'S BILL < 100, AND NOT TOTAL CUSTOMER'S BILL < 100
@@ -876,17 +943,14 @@ public class MechanicShop{
 		try{
    //CHANGE IT UP A BIT MORE
    //DOES IT WORK?
-   //ERROR CHECK INPUT, MAKE SURE IT IS MORE THAN ZERO
 	 		//String query = "SELECT car.make, car.model, request.blah FROM Car car, (SELECT service.car_vin, COUNT(service.rid) AS blah FROM Service_Request service GROUP BY service.car_vin) AS request WHERE request.car_vin = car.vin ORDER BY request.COUNT(service.rid) DESC LIMIT ";
              
-      String query = "SELECT car.make, car.model, request.blah FROM Car car, (SELECT service.car_vin, COUNT(service.rid) AS blah FROM Service_Request service GROUP BY service.car_vin) AS request WHERE request.car_vin = car.vin ORDER BY request.blah DESC LIMIT ";
-             
-     //String query = "SELECT make, model, COUNT(*) "
-     
+      //String query = "SELECT car.make, car.model, request.blah FROM Car car, (SELECT service.car_vin, COUNT(service.rid) AS blah FROM Service_Request service GROUP BY service.car_vin) AS request WHERE request.car_vin = car.vin ORDER BY request.blah DESC LIMIT ";
+       
+       String query = "SELECT car.make, car.model, COUNT(*) FROM Service_Request service, Car car WHERE service.car_vin = car.vin GROUP BY car.vin ORDER BY COUNT(*) DESC LIMIT ";      
      
       System.out.print("\tEnter a value for K: $");
          String input = in.readLine();
-
          while(input.length() == 0 || !input.matches("[0-9]+"))
          {
            System.out.print("\tValue incorrectly entered. Enter a value for K: $");
@@ -908,10 +972,13 @@ public class MechanicShop{
 		try{
    //CHANGE IT UP A BIT MORE
    //DOES IT WORK?
-	 		String query = "SELECT customer.fname, customer.lname, SUM(close.bill) FROM Customer customer, (SELECT service.customer_id, SUM(close.bill) FROM Service_Request service, Closed_Request close WHERE service.rid = close.rid) AS all_service WHERE all_service.customer_id = customer.id ORDER BY all_service.SUM(close.bill) DESC";
+	 		String query = "SELECT customer.fname, customer.lname, billSum FROM Customer customer, (SELECT SUM(close.bill) AS billSum, service.customer_id FROM Service_Request service, Closed_Request close WHERE service.rid = close.rid GROUP BY service.customer_id) AS all_request WHERE all_request.customer_id = customer.id ORDER BY all_request.billSum DESC";
       List<List<String>> rows = esql.executeQueryAndReturnResult(query);
-	 		//System.out.println("total row(s): " + rows);
-      //HOW TO PRINT OUT
+	 		
+      for(int i = 0; i < rows.size(); ++i){
+				System.out.println((i + 1) + ") " + rows.get(i).get(0) + " " + rows.get(i).get(1) + " $" + rows.get(i).get(2));
+      }                   
+                         
 	   }catch(Exception e){
 	 		System.err.println(e.getMessage());
     }
