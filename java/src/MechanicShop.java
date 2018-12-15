@@ -940,7 +940,7 @@ public class MechanicShop{
      		
         System.out.println( "-> Customer First Name and Last Name, Closed Request Date, Comment, and Bill");
        for(int i = 0; i < rows.size(); ++i){
-				System.out.println((i + 1) + ") " + rows.get(i).get(0) + " " + rows.get(i).get(1) + " " + rows.get(i).get(2) + " " + rows.get(i).get(3) + " $" + rows.get(i).get(4));
+				System.out.println((i + 1) + "); Fname: " + rows.get(i).get(0) + "; Lname: " + rows.get(i).get(1) + "; date: " + rows.get(i).get(2) + "; comment: " + rows.get(i).get(3) + "; bill: $" + rows.get(i).get(4));
       }
           
    		}catch(Exception e){
@@ -952,11 +952,11 @@ public class MechanicShop{
 		try{
          //For each customer, count the number of car vins they have in the owns relation. If the customer sid is connected to more than 20 vins, then store it in a list.
 
-          String query = "SELECT customer.fname, customer.lname FROM (SELECT owns.customer_id FROM Owns owns GROUP BY owns.customer_id HAVING COUNT(owns.customer_id) > 20) AS owntwenty, Customer customer WHERE customer.id = owntwenty.customer_id";
+          String query = "SELECT customer.id, customer.fname, customer.lname FROM (SELECT owns.customer_id FROM Owns owns GROUP BY owns.customer_id HAVING COUNT(owns.customer_id) > 20) AS owntwenty, Customer customer WHERE customer.id = owntwenty.customer_id";
      			List<List<String>> rows = esql.executeQueryAndReturnResult(query);
      		  
             for(int i = 0; i < rows.size(); ++i){
-				System.out.println((i + 1) + ") " + rows.get(i).get(0) + " " + rows.get(i).get(1));
+				System.out.println((i + 1) + ") ID: " + rows.get(i).get(0) + "; Fname: " + rows.get(i).get(1) + "; Lname: " + rows.get(i).get(1));
       }
             
    		}catch(Exception e){
@@ -972,7 +972,7 @@ public class MechanicShop{
       List<List<String>> rows = esql.executeQueryAndReturnResult(query);
 	 		
       for(int i = 0; i < rows.size(); ++i){
-				System.out.println((i + 1) + ") " + rows.get(i).get(0) + " " + rows.get(i).get(1) + " " + rows.get(i).get(2));
+				System.out.println((i + 1) + ") make: " + rows.get(i).get(0) + "; model: " + rows.get(i).get(1) + "; year: " + rows.get(i).get(2));
       }                   
                          
 	   }catch(Exception e){
@@ -996,7 +996,7 @@ public class MechanicShop{
       List<List<String>> rows = esql.executeQueryAndReturnResult(query);
 	 		
       for(int i = 0; i < rows.size(); ++i){
-				System.out.println((i + 1) + ") " + rows.get(i).get(0) + " " + rows.get(i).get(1) + " " + rows.get(i).get(2));
+				System.out.println((i + 1) + ") make: " + rows.get(i).get(0) + "; model: " + rows.get(i).get(1) + "; # of service requests: " + rows.get(i).get(2));
       }                     
                          
 	   }catch(Exception e){
@@ -1008,11 +1008,11 @@ public class MechanicShop{
 		try{
    //Sum up all of the bills for each customer. Order customers based on total bill with the highest bill at the top
 
-	 		String query = "SELECT customer.fname, customer.lname, billSum FROM (SELECT SUM(close.bill) AS billSum, service.customer_id FROM Service_Request service, Closed_Request close WHERE service.rid = close.rid GROUP BY service.customer_id) AS all_request, Customer customer WHERE all_request.customer_id = customer.id ORDER BY all_request.billSum DESC";
+	 		String query = "SELECT customer.id, customer.fname, customer.lname, billSum FROM (SELECT SUM(close.bill) AS billSum, service.customer_id FROM Service_Request service, Closed_Request close WHERE service.rid = close.rid GROUP BY service.customer_id) AS all_request, Customer customer WHERE all_request.customer_id = customer.id ORDER BY all_request.billSum DESC";
       List<List<String>> rows = esql.executeQueryAndReturnResult(query);
 	 		
       for(int i = 0; i < rows.size(); ++i){
-				System.out.println((i + 1) + ") " + rows.get(i).get(0) + " " + rows.get(i).get(1) + " $" + rows.get(i).get(2));
+				System.out.println((i + 1) + ") ID: " + rows.get(i).get(0) + "; Fname:" + rows.get(i).get(1) + "; Lname:" + rows.get(i).get(2)  + "; TotalBill: $" + rows.get(i).get(3));
       }                   
                          
 	   }catch(Exception e){
